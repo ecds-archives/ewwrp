@@ -1,0 +1,48 @@
+    <form action='{% url page_in_collection app=app.shortname %}'>
+        Order by <select name="sort_by">
+        {% for name, val in can_sort_by %}
+            <option value="{{ val }}"{% if sort_by == val %} selected{% endif %}>{{ name }}</option>
+        {% endfor %}
+        </select>
+        and display <select name="results_per_page">
+        {% for num, val in res_per_page %}
+            <option value="{{ val }}"{% if results_per_page == val %} selected{% endif %}>{{ num }}</option>
+        {% endfor %}
+        </select> results.
+        {% for key, val in queries.items %}
+        {% if key != 'sort_by' and key != 'results_per_page' %}<input type="hidden" name="{{ key }}" value="{{ val }}">{% endif %}
+        {% endfor %}
+        <input type="submit" value="Filter">
+    </form>
+
+    <div class="above-browse">
+		{{ num_pages }} document{{ num_pages|pluralize }}. Displaying documents {{ pages.start_index }} - {{ pages.end_index }}.
+	</div>
+
+    <!-- Navigation Bar Top -->
+	<table class="browse-bar" style="color: #CCCCFF; background: #{{ app.color }}; width: 100%; font-size: 14px; margin-bottom: 10px; margin-top: 10px;">
+		<tr>
+			<td>{% if pages.number != 1 %}<a href="{% url page_in_collection app=app.shortname %}?{{ queries.urlencode }}&current_page=1">First</a>{% else %}First{% endif %}</td>
+			<td>{% if pages.has_previous %}<a href="{% url page_in_collection app=app.shortname %}?{{ queries.urlencode }}&current_page={{ pages.previous_page_number }}">Previous</a>{% else %}Previous{% endif %}</td>
+			<td style="text-align: right;">{% if pages.has_next %}<a href="{% url page_in_collection app=app.shortname %}?{{ queries.urlencode }}&current_page={{ pages.next_page_number }}">Next</a>{% else %}Next{% endif %}</td>
+			<td style="text-align: right;">{% if pages.number != pages.paginator.num_pages %}<a href="{% url page_in_collection app=app.shortname %}?{{ queries.urlencode }}&current_page={{ pages.paginator.num_pages }}">Last</a>{% else %}Last{% endif %}</td>
+		</tr>
+	</table>
+
+	<div class="browse-results" style="width: 100%;">
+		{% for page in pages %}
+				<div class="title"><a style="color: #{{ app.color }}; font-size: 13px; margin: 0; padding: 0;" href="{% url 'page' app=app.shortname doc_id=page.id page='contents' %}">{{ page.title }}</a></div>
+				<div class="details" style="font-size: 13px; margin: 0; padding: 0;">{% if page.author %}{{ page.author }}, {% endif %}{{ page.collection }} Collection</div>
+			{% if not forloop.last %}<hr>{% endif %}
+		{% endfor %}
+	</div>
+
+    <!-- Navigation Bar Bottom -->
+	<table class="browse-bar" style="color: #CCCCFF; background: #{{ app.color }}; width: 100%; font-size: 14px; margin-bottom: 10px; margin-top: 10px;">
+		<tr>
+			<td>{% if pages.number != 1 %}<a href="{% url page_in_collection app=app.shortname %}?{{ queries.urlencode }}&current_page=1">First</a>{% else %}First{% endif %}</td>
+			<td>{% if pages.has_previous %}<a href="{% url page_in_collection app=app.shortname %}?{{ queries.urlencode }}&current_page={{ pages.previous_page_number }}">Previous</a>{% else %}Previous{% endif %}</td>
+			<td style="text-align: right;">{% if pages.has_next %}<a href="{% url page_in_collection app=app.shortname %}?{{ queries.urlencode }}&current_page={{ pages.next_page_number }}">Next</a>{% else %}Next{% endif %}</td>
+			<td style="text-align: right;">{% if pages.number != pages.paginator.num_pages %}<a href="{% url page_in_collection app=app.shortname %}?{{ queries.urlencode }}&current_page={{ pages.paginator.num_pages }}">Last</a>{% else %}Last{% endif %}</td>
+		</tr>
+	</table>

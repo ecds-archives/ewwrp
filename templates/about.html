@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block head %}
+	<style>
+		.about-text a {
+			color: #{{ app.color }};
+		}
+		.about-header {
+			margin-top: 50px;
+			width: 100%;
+			font-size: 30px;
+			text-align: center;
+		}
+	</style>
+{% endblock %}
+
+{% block body %}
+<div class="about-text">
+<div class="about-header">About the Emory Women Writers Resource Project</div>
+<p>The current Emory Women Writers Resource Project site represents the
+joining of the original EWWRP site and the Womens Genre Fiction site.</p>
+
+<p>The Emory Women Writers Resource Project began in 1994 as
+pedagogical tool designed to offer graduate and undergraduate students
+the opportunity to create critical editions of texts. Examples of
+student editions are available under the Essays link. The project has
+expanded each year to include new texts. The texts are digitized by
+graduate students, and marked up in XML according to the Text Encoding
+Initiative standards. The texts have been selected in consultation
+with Dr. Sheila Cavanagh of the English Department, the editor of the
+site.</p>
+
+<p>In 2002 the National Endowment for the Humanities (NEH) awarded a
+grant to create an online database of American and British genre
+fiction written by and about women in the late nineteenth and early
+twentieth centuries to the Emory Women Writers Resource Project
+(EWWRP) of Emory University. Spanning from the 1860's through the
+1920's, the period addressed by the project roughly coincides with the
+peak of the popularity of dime novels. Emory's Robert W. Woodruff
+Library houses an extensive collection of detective, crime, and
+romance novels and provided the source texts for this digitization
+project. The Women's Genre Fiction Project publishes an unprecedented
+collection of female-authored and female-centered texts from a range
+of genres, as well as the largest searchable database of digitized
+genre fiction.</p>
+
+<p>During the three-year project, staff selected, digitally converted,
+proofread, and encoded 100,000 pages from hundreds of literary
+texts. All texts were marked up in XML, using the Text Encoding
+Initiative's (TEI) Document Type Definition (DTD). Project staff
+captured pages as archival quality TIFF images and archived a copy of
+each file for preservation purposes. All encoded files have been added
+to the existing database that hosts the EWWRP.</p>
+
+<p>The project's editorial board expects the project to accomplish two
+principal objectives. First, the database will expand access to a
+significant facet of American and British culture. The electronic
+publication of women's genre fiction makes these novels widely
+available in searchable, digital form for the first time. By
+disseminating texts that have been under-represented in library
+collections, the database will facilitate scholarly work and teaching
+in a range of areas, including American and British history and
+literature, late nineteenth- and early twentieth-century culture, and
+women's studies. Second, publishing these works in electronic format
+will reduce unnecessary handling of the fragile originals, thus
+helping to preserve them.</p>
+
+<div class="about-header">Navigating the Site</div>
+<p>The site is divided into collections: <a href="{% url 'index' app='genrefiction' %}">Genre
+Fiction</a>, including the 250 novels digitized by the Beck Center
+under the NEH grant; <a href="{% url 'index' app='earlymodern' %}">Early Modern</a> literature
+through the 18th century; <a href="{% url 'index' app='twentiethcentury' %}">Early 20th
+century</a> literature; <a href="{% url 'index' app='worldwari' %}">World War I poetry</a>; <a
+href="{% url 'index' app='nativeamerican' %}">Native American</a> texts; <a
+href="{% url 'index' app='abolition' %}">Abolition, Freedom, and Rights</a>; and <a
+href="{% url 'index' app='advocacy' %}">Women's Advocacy</a> texts. Some texts appear in more
+than one collection. </p>
+
+<p>The texts may be accessed by searching or browsing. In the browse
+view the default listing is by author, but using the links below the title of the work, users may view texts by title, ethnicity of the author,
+geographic location of the author, subject, publisher, or
+genre. In addition, where spine images are available, books may be
+viewed as on a bookshelf. Clicking the spine will take the user to the
+table of contents. </p>
+
+<p>Users may search by keyword from any page; if you are in a
+collection, the keyword query will search that collection. To search
+the entire collection select the Emory Women Writers Resource
+Project link at the top of the collections. In addition, users may
+access an advanced search which allows searching by author, title,
+date, and subject fields. The advanced search offers suggestions based
+on the material in the collection.</p>
+
+<p>Whether browsing or searching, the list view presents the first 20
+results. To view more results click "Next" on the navigation bar, or
+use the jump list on the right to jump to any set of 20. </p>
+
+<p>Search results are returned with the highest frequency of hits
+first. To see the search result in a brief context, click on the
+number of hits. To view the text with highlighted results, click on
+the table of contents in the keyword view. Clicking on the title in
+the results list goes to the table of contents of the work.</p>
+</div>
+{% endblock %}

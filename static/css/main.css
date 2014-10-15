@@ -1,0 +1,90 @@
+/* General things */
+@font-face {
+	font-family: Quattrocento;
+	src: url('../fonts/Quattrocento-Regular.ttf');
+}
+body {
+	font-family: Quattrocento;
+}
+a {
+	color: white;
+	text-decoration: none;
+}
+a:hover {
+	text-decoration: underline;
+}
+
+/* Everything relating to the header */
+#header {
+	position: fixed;
+	left: 0px;
+	right: 0px;
+	top: 0px;
+	padding: 0px 5px 0px 5px;
+}
+#header-nav {
+	text-align: center;
+	padding: 2px;
+	margin: 0;
+	font-size: 12px;
+}
+#header-nav li {
+	display: inline;
+}
+#header-nav li + li:before {
+	content: " | ";
+	color: white;
+}
+
+/* Everything relating to the body */
+#body {
+	margin-top: 28px;
+	margin-left: 5px;
+	margin-bottom: 40px;
+}
+
+/* Everything relating to the footer */
+#footer {
+	font-size: 20px;
+	position: fixed;
+	left: 0px;
+	right: 0px;
+	bottom: 0px;
+}
+#footer #eww {
+	color: white;
+	width: 75%;
+	text-align: right;
+	float: left;
+}
+#footer #rp {
+	color: white;
+	width: 25%;
+	text-align: left;
+	float: left;
+}
+#footer #rp span {
+	padding-left: 5px;
+}
+#footer #eww span {
+	padding-right: 5px;
+}
+@media (min-width:1100px) {
+	#footer {
+		font-size: 35px;
+	}
+	#body {
+		margin-bottom: 55px;
+	}
+}
+@media (max-width:800px) {
+	#footer {
+		width: 800px;
+	}
+	#footer #eww {
+		width: 30%;
+	}
+	#footer #rp {
+		width: 70%;
+	}
+}

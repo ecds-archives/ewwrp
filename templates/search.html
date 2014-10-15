@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block head %}
+	<style>
+		.form-div {
+			border: 1px solid black;
+			padding: 5px 5px 5px 5px;
+			margin-bottom: 10px;
+		}
+		.adv-search {
+			color: #{{ app.color }};
+			font-size: 10px;
+		}
+        .form_label_tag {
+            width: 130px;
+            float: left;
+        }
+        .errorlist {
+            padding: 0;
+            margin: 0;
+            color: red;
+            font-size: 12px;
+        }
+        .errorlist li {
+            list-style-type: none;
+            display: inline;
+        }
+        .field-wrapper {
+            padding-bottom: 5px;   
+        }
+	</style>
+{% endblock %}
+
+{% block body %}
+	<h1>Search</h1>
+	<div class="form-div">
+		<form class='search-form' action='{% if advanced %}{% url 'advsearch' app=app.shortname %}{% else %}{% url 'search' app=app.shortname %}{% endif %}' method='get'>
+			{% csrf_token %}
+			{% for field in form %}
+				<div class="field-wrapper">
+					{{ field.errors }}
+					<div class="form_label_tag">{{ field.label_tag }}</div><div class="form_field">{{ field }}</div>
+				</div>
+			{% endfor %}
+		{% if advanced %}<a class="adv-search" href="{% url 'search' app=app.shortname %}">Fewer options</a>{% else %}<a class="adv-search" href="{% url 'advsearch' app=app.shortname %}">More options</a>{% endif %}<br/><br/>
+			<input type="submit" value="Search">
+		</form>
+	</div>
+	{% if pages %}{% include 'results.html' %}{% elif form.is_valid %}No results found.{% endif %}
+{% endblock %}
