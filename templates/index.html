@@ -20,14 +20,6 @@
 			color: black;
 			text-decoration: underline;
 		}
-		#body #text-bottom {
-			position: absolute;
-			width: 400px;
-			bottom: 0px;
-			left: 0px;
-			padding-bottom: 35px;
-			padding-left: 20px;
-		}
 		@media (min-width:1100px) {
 			#body #text-bottom {
 				padding-bottom: 55px;
@@ -62,7 +54,7 @@
 			<li><a href="{% url 'essays' app=app.shortname %}">Essays</a></li>
 			<li><a href="{% url 'about' app=app.shortname %}">About</a></li>
 		</ul>
-	</div>
+	</div><br/>
 	<div id="text-bottom">
 		<h1>Collections</h1>
 		<ul>

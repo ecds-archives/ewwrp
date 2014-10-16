@@ -2,44 +2,34 @@
 <html>
 	<head>
 		{% load staticfiles %}
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
 		<link rel="stylesheet" href="{% static 'css/main.css' %}">
 		<link rel="stylesheet" href="{% static 'css/tei.css' %}">
 		<title>Emory Women Writers Resource Project</title>
 		<style>
-			#header {
-				background-color: #{{ app.color }};
-			}
-			#footer {
-				background-color: #{{ app.color }};
-			}
-			#footer #rp {
-				opacity: 0.4;
-			}
-			#collectionmenu {
-				position: absolute;
-				top: 25px;
-				right: 5px;
-			}
+			#header { background-color: #{{ app.color }}; }
+			#footer { background-color: #{{ app.color }}; }
 		</style>
-		<script type="text/javascript">
-			function goto(sel) {
-				document.location.href = sel.value;
-			}
-		</script>
 		{% block head %}{% endblock %}
 	</head>
 	<body>
-		<div id="collectionmenu">
-			{% if page_in_collection != 'page' %}
-			<select name="collections" onchange="goto(this)">
-                {% for collection in collections.values %}
-                <option value="{% url page_in_collection app=collection.shortname %}"{% if app == collection %} selected{% endif %}>{{ collection.name }}</option>
-                {% endfor %}
-			</select>
-			{% endif %}
-		</div>
 		<div id="header">
 			<ul id="header-nav">
+			{% if page_in_collection != 'page' %}
+                <li>
+                    <span class="dropdown" id="collectionmenu">
+                        <a class="dropdown-toggle" data-toggle="dropdown" style="cursor: pointer;">
+                            Collections
+                            <span class="caret" style="margin-bottom: 3px;"></span>
+                        </a>
+                        <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+                            {% for collection in collections.values %}
+                            <li role="presentation"><a href="{% url page_in_collection app=collection.shortname %}" {% if app == collection %}style="color:white; background-color:#{{ collection.color }};{% endif %}" role="menuitem" tabindex="-1" href="#">{{ collection.name }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </span>
+                </li>
+			{% endif %}
 				<li><a href="{% url 'index' app=app.shortname %}">Home</a></li>
 				<li><a href="{% url 'browse' app=app.shortname %}">Browse</a></li>
 				<li><a href="{% url 'search' app=app.shortname %}">Search</a></li>
@@ -47,7 +37,7 @@
 				<li><a href="{% url 'about' app=app.shortname %}">About</a></li>
 			</ul>
 		</div>
-		<div id="body">
+		<div id="body" class="container-fluid">
 			{% block body %}{% endblock %}
 		</div>
 		<div id="footer">
@@ -59,6 +49,7 @@
 			</div>
 		</div>
         <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
         <script src="{% static 'js/main.js' %}"></script>
 	</body>
 </html>

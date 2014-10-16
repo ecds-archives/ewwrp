@@ -4,6 +4,8 @@ import re
 from forms import *
 from models import *
 
+import time
+
 from itertools import chain
 
 from settings import COLLECTIONS, DEFAULT_COLLECTION, DEFAULT_ORDERING
@@ -47,7 +49,7 @@ def makeURL(**kwargs):
     return '?' + '&'.join("{!s}={!s}".format(key,val) for (key,val) in kwargs.items())
 
 def importantContextValues(app):
-    ''' Values that should be available from any template '''
+    ''' Values that should be available from any template. This is basically a work-around for managing apps '''
     return {'app': COLLECTIONS[app], 'collections': COLLECTIONS, 'can_sort_by': (('Author','author'), ('Title','title')), 'res_per_page': ((10,10), (20,20), (50,50))}
 ''' End helper methods '''
 
@@ -55,18 +57,17 @@ def page(request, doc_id, page, app=DEFAULT_COLLECTION):
     ''' Display a specific page '''
     context = {'app': COLLECTIONS[app]}
     context['page_in_collection'] = 'page'
-    document = Documents.docs.get(id=doc_id)
+    document = Docs.objects.get(id=doc_id)
     context['document'] = document
     if page != 'contents':
-        # Get list of ids in order
-        ids = Pages.pages.filter(doc_id__in=doc_id)
-        
-        ### NEED A WAY TO SPECIFY SPECIFIC DOC_ID
-        
-        id_list = [i.id for i in ids]
+        # Create ordered list of all the divs
+        id_list = [i.id for i in document.divs]
         
         # Position of current id
         position = id_list.index(page)
+        
+        # Get the current page
+        docpage = document.divs[position]
         
         # Get ID of prev and next pages
         if position > 0:
@@ -75,7 +76,6 @@ def page(request, doc_id, page, app=DEFAULT_COLLECTION):
             context['next_id'] = id_list[position+1]
         
         # Get the current page
-        docpage = Pages.pages.get(id=page)
         context['docpage'] = docpage
         
         # Apply xsl transform
@@ -96,11 +96,56 @@ def about(request, app=DEFAULT_COLLECTION):
     context['page_in_collection'] = 'about'
     return render_to_response('about.html',context,context_instance=RequestContext(request))
 
-def essays(request, app=DEFAULT_COLLECTION):
+def essays(request, essay_id='all', app=DEFAULT_COLLECTION):
     ''' Essays - still need to make this work, but it should be quick '''
     context = importantContextValues(app)
     context['page_in_collection'] = 'essays'
-    return render_to_response('index.html',context,context_instance=RequestContext(request))
+    
+    # Copy GET info over to a variable
+    queries = request.GET.copy()
+    
+    # If the user is on a certain page, get that page and remove it from the query; otherwise, default to first page
+    if 'current_page' in request.GET and isInt(request.GET['current_page']):
+        current_page = int(request.GET['current_page'])
+        del queries['current_page']
+    else:
+        current_page = 1
+    
+    # If the user specified the number of results per page, use that. Default to 10.
+    if 'results_per_page' in request.GET and isInt(request.GET['results_per_page']):
+        results_per_page = int(request.GET['results_per_page'])
+    else:
+        results_per_page = 10
+    context['results_per_page'] = results_per_page
+    
+    if essay_id == 'all':
+        # Get all the essays in this app
+        filt = {'collection__in': COLLECTIONS[app]['name']}
+        pageobjs = Essays.objects.filter(filt)
+    else:
+        # Get a specific essay and deliver it
+        pageobjs = Essays.objects.get(id=essay_id)
+    
+    # Order by user-specified criteria
+    if 'sort_by' in request.GET and len(request.GET['sort_by'])>0:
+        pageobjs = pageobjs.order_by(request.GET['sort_by'])
+        context['sort_by'] = request.GET['sort_by']
+
+    # Pass the GET data, minus current page, to the context
+    context['queries'] = queries
+    
+    paginator = Paginator(pageobjs, results_per_page)
+
+    try:
+        pages = paginator.page(current_page)
+    except PageNotAnInteger:
+        pages = paginator.page(1)
+    except EmptyPage:
+        pages = paginator.page(paginator.num_pages)
+
+    context['pages'] = pages
+
+    return render_to_response('essays.html',context,context_instance=RequestContext(request))
 
 def search(request, method='basic', app=DEFAULT_COLLECTION):
     ''' Search for a document within a collection, using either basic or advanced search '''
@@ -142,6 +187,7 @@ def search(request, method='basic', app=DEFAULT_COLLECTION):
     context['results_per_page'] = results_per_page
 	
 	# Parse for search options
+    start_time = time.time()
     search_opts = {}
     if 'title' in form.cleaned_data and form.cleaned_data['title']:
         search_opts['title__fulltext_terms'] = form.cleaned_data['title']
@@ -149,24 +195,20 @@ def search(request, method='basic', app=DEFAULT_COLLECTION):
         search_opts['author__fulltext_terms'] = form.cleaned_data['author']
     if 'keyword' in form.cleaned_data and form.cleaned_data['keyword']:
         search_opts['fulltext_terms'] = form.cleaned_data['keyword']
+    if 'collection' in form.cleaned_data and form.cleaned_data['collection']:
+        if isinstance(form.cleaned_data['collection'],str):
+            search_opts['collection__in'] = COLLECTIONS[form.cleaned_data['collection']]['name']
+        elif isinstance(form.cleaned_data['collection'],list):
+            search_opts['collection__in'] = [COLLECTIONS[m]['name'] for m in form.cleaned_data['collection']]
+    print time.time() - start_time
     
     # Get all documents, filter with search options, and order by score
-    pageobjs = Documents.docs.filter(**search_opts).order_by('-fulltext_score')
+    pageobjs = Docs.objects.filter(**search_opts).order_by('-fulltext_score')
     
-    # If the user is in a collection other than the default collection
-    if 'collection' in form.cleaned_data and form.cleaned_data['collection']:
-        if isinstance(form.cleaned_data['collection'], str):
-            pageobjs = pageobjs.filter(collection__in=COLLECTIONS[form.cleaned_data['collection']]['name'])
-        elif isinstance(form.cleaned_data['collection'], list):
-            pageobjs = pageobjs.filter(collection__in=[COLLECTIONS[m]['name'] for m in form.cleaned_data['collection']])
-    
-    # Order by user-specified criteria
+    # Order by user-specified criteria, if they do specify it
     if 'sort_by' in request.GET and len(request.GET['sort_by'])>0:
         pageobjs = pageobjs.order_by(request.GET['sort_by'])
         context['sort_by'] = request.GET['sort_by']
-    else:
-        pageobjs = pageobjs.order_by(DEFAULT_ORDERING)
-        context['sort_by'] = DEFAULT_ORDERING
     
     # Pass queries to context
     context['queries'] = queries # Current queries
@@ -181,12 +223,12 @@ def search(request, method='basic', app=DEFAULT_COLLECTION):
         pages = paginator.page(paginator.num_pages)
     
     # Pass a bunch of variables to the template
-    context['num_pages'] = len(pageobjs)
     context['pages'] = pages
     
     # Render template
     return render_to_response('search.html',context,context_instance=RequestContext(request))
 
+# This could use being updated
 def browse(request, app=DEFAULT_COLLECTION):
     ''' Browse the collection '''
     context = importantContextValues(app)
@@ -211,10 +253,10 @@ def browse(request, app=DEFAULT_COLLECTION):
     
     # Get all the documents in the current collection
     if app != DEFAULT_COLLECTION:
-        pageobjs = Documents.docs.filter(collection=COLLECTIONS[app]['name'])
+        pageobjs = Docs.objects.filter(collection=COLLECTIONS[app]['name']).all()
     else:
         # If in the default collection don't filter
-        pageobjs = Documents.docs
+        pageobjs = Docs.objects.all()
     
     # Order by user-specified criteria
     if 'sort_by' in request.GET and len(request.GET['sort_by'])>0:
@@ -226,8 +268,7 @@ def browse(request, app=DEFAULT_COLLECTION):
 
     # Pass the GET data, minus current page, to the context
     context['queries'] = queries
-        
-    pageobjs = pageobjs.all()
+    
     paginator = Paginator(pageobjs, results_per_page)
 
     try:
@@ -237,7 +278,6 @@ def browse(request, app=DEFAULT_COLLECTION):
     except EmptyPage:
         pages = paginator.page(paginator.num_pages)
 
-    context['num_pages'] = len(pageobjs)
     context['pages'] = pages
 
     return render_to_response('browse.html',context,context_instance=RequestContext(request))

@@ -3,14 +3,21 @@ from eulexistdb.models import XmlModel
 from eulxml.xmlmap.teimap import Tei, TeiDiv, TEI_NAMESPACE
 from eulxml import xmlmap
 
-class Pages(XmlModel, TeiDiv):
+class Pages(XmlModel, Tei, TeiDiv):
+    ''' Specify a page in the document '''
     ROOT_NAMESPACES = {'tei' : TEI_NAMESPACE}
     pages = Manager('//tei:div')
-    doc_id = xmlmap.StringField('tei:TEI/@xml:id')
 
-class Documents(XmlModel, Tei):
-    ROOT_NAMESPACES = {'tei' : TEI_NAMESPACE}
-    docs = Manager('//tei:TEI')
-    ids = xmlmap.StringListField('//tei:div/@xml:id')
+class Docs(XmlModel, Tei):
+    ''' Attributes of the entire document '''
+    ROOT_NAMESPACES = {'tei': TEI_NAMESPACE}
+    objects = Manager("//tei:TEI")
+    id = xmlmap.StringField('@xml:id')
+    divs = xmlmap.NodeListField('//tei:div', TeiDiv)
     author = xmlmap.StringField('(//tei:author/tei:name/tei:choice/tei:reg | //tei:titleStmt/tei:author/@n)[1]')
     collection = xmlmap.StringField("tei:teiHeader/tei:profileDesc/tei:creation/tei:rs[@type='collection']")
+    
+class Essays(XmlModel, Tei):
+    ROOT_NAMESPACES = {'tei': TEI_NAMESPACE}
+    objects = Manager("//tei:div[@type='critical essay']")
+    collection = xmlmap.StringField("//tei:rs[@type='collection']")
