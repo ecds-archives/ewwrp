@@ -46,3 +46,37 @@
         <li><a style="padding: 0; margin: 0; background-color: #{{ app.color }}; color: white;" href="{% if pages.has_next %}{% url page_in_collection app=app.shortname %}?{{ queries.urlencode }}&current_page={{ pages.next_page_number }}{% else %}#{% endif %}">Next</a></li>
         <li><a style="padding: 0; margin: 0; background-color: #{{ app.color }}; color: white;" href="{% if pages.number != pages.paginator.num_pages %}{% url page_in_collection app=app.shortname %}?{{ queries.urlencode }}&current_page={{ pages.paginator.num_pages }}{% else %}#{% endif %}">Last</a></li>
     </ul>
+
+<script type="text/javascript">
+$(document).ready(function() {
+    getResults();
+});
+
+function getResults() {
+    var getCookies = function() {
+        var pairs = document.cookie.split(";");
+        var cookies = {};
+        for (var i = 0; i < pairs.length; i++) {
+            var pair = pairs[i].split("=");
+            cookies[pair[0]] = unescape(pair[1]);
+        }
+        return cookies;
+    }
+    var cookies = getCookies();
+    $.ajaxSetup({
+        headers: {
+            "X-CSRFToken": cookies["csrftoken"]
+        }
+    })
+    var request = $.ajax({
+        url: "/ajax/",
+        type: "POST",
+        data: {
+            id: "myid",
+        }
+    });
+    request.done(function(data) {
+        alert(data.current_page);
+    });
+}
+</script>

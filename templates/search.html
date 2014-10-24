@@ -37,7 +37,7 @@
 {% block body %}
 	<h1>Search</h1>
 	<div class="form-div">
-		<form class='search-form' action='{% if advanced %}{% url 'advsearch' app=app.shortname %}{% else %}{% url 'search' app=app.shortname %}{% endif %}' method='get'>
+		<form class='search-form' action='{% url "ajax" %}' method='post'>
 			{% csrf_token %}
 			{% for field in form %}
 				<div class="field-wrapper">
@@ -46,8 +46,13 @@
 				</div>
 			{% endfor %}
 		{% if advanced %}<a class="adv-search" href="{% url 'search' app=app.shortname %}">Fewer options</a>{% else %}<a class="adv-search" href="{% url 'advsearch' app=app.shortname %}">More options</a>{% endif %}<br/><br/>
-			<input type="submit" value="Search">
+			<input type="submit" id="searchButton" name="searchButton" value="Search">
 		</form>
 	</div>
-	{% if pages %}{% include 'results.html' %}{% elif form.is_valid %}No results found.{% endif %}
+	{% include 'results.html' %}
+    <script type="text/javascript">
+        $('#searchButton').submit(function(event) {
+            event.preventDefault();
+        });
+    </script>
 {% endblock %}

@@ -15,6 +15,8 @@ from django.http import Http404
 from django.shortcuts import render_to_response, redirect, HttpResponse, Http404
 from django.template import RequestContext
 
+import json
+
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 ''' Helper methods for views '''
@@ -48,15 +50,24 @@ def safeRange(r, a, b):
 def makeURL(**kwargs):
     return '?' + '&'.join("{!s}={!s}".format(key,val) for (key,val) in kwargs.items())
 
-def valueOrDefault(request, post_val, default_value):
+def valueOrDefault(request, val, default_value):
     try:
-        if not request.POST[post_val]:
-            return default_value
-        try:
-            int(default_value)
-            return int(request)
-        except ValueError:
-            return request.POST[post_val]
+        if request.method == 'POST':
+            if val not in request.POST:
+                return default_value
+            try:
+                int(default_value)
+                return int(request)
+            except ValueError:
+                return request.POST[val]
+        elif request.method == 'GET':
+            if val not in request.GET:
+                return default_value
+            try:
+                int(default_value)
+                return int(request)
+            except ValueError:
+                return request.GET[val]
     except ValueError:
         return default_value
 
@@ -65,20 +76,55 @@ def importantContextValues(app):
     return {'app': COLLECTIONS[app], 'collections': COLLECTIONS, 'can_sort_by': (('Author','author'), ('Title','title')), 'res_per_page': ((10,10), (20,20), (50,50))}
 ''' End helper methods '''
 
-def results(request):
-    ''' AJAX call for results '''
+def req(request):
+    ''' AJAX method for rendering page '''
     if request.is_ajax():
         try:
-            if 'filter' not in request.POST and request.POST['filter']:
-                return HttpResponse(json.dumps({'error': 'true', 'code': 'did not pass a filter'}), content_type='application/json')
+            start_time = time.time()
+            toReturn = {}
             current_page = valueOrDefault(request, 'current_page', 1)
             results_per_page = valueOrDefault(request, 'results_per_page', 10)
+    
+            # Parse for search options
+            search_opts = {}
+            if 'title' in request.POST and request.POST['title']:
+                search_opts['title__fulltext_terms'] = request.POST['title']
+            if 'author' in request.POST and request.POST['author']:
+                search_opts['author__fulltext_terms'] = request.POST['author']
+            if 'keyword' in request.POST and request.POST['keyword']:
+                search_opts['fulltext_terms'] = request.POST['keyword']
+            if 'collection' in request.POST and request.POST['collection']:
+                if isinstance(request.POST['collection'],str):
+                    search_opts['collection__in'] = COLLECTIONS[request.POST['collection']]['name']
+                elif isinstance(form.cleaned_data['collection'],list):
+                    search_opts['collection__in'] = [COLLECTIONS[m]['name'] for m in request.POST['collection']]
             
+            pageobjs = Docs.objects.filter(**search_opts).order_by('-fulltext_score')
+                
+            # Order by user-specified criteria, if they do specify it
+            if 'sort_by' in request.POST and len(request.POST['sort_by'])>0:
+                pageobjs = pageobjs.order_by(request.GET['sort_by'])
+                context['sort_by'] = request.POST['sort_by']
+            
+            # Create paginator safely
+            paginator = Paginator(pageobjs, results_per_page)
+            try:
+                pages = paginator.page(current_page)
+            except EmptyPage:
+                pages = paginator.page(paginator.num_pages)
+            
+            if pages.has_previous():
+                toReturn['previous_page_number'] = pages.previous_page_number
+            if pages.has_next():
+                toReturn['next_page_number'] = pages.next_page_number
+            
+            print 'Time is', (time.time() - start_time)
+            return HttpResponse(json.dumps(toReturn), content_type='application/json')
         except Exception, e:
-            print str(e)
-            raise Http404
+            print e
+            return HttpResponse(json.dumps({'error': e}), content_type='application/json')
     else:
-        raise Http404
+        return Http404
 
 def search(request, method='basic', app=DEFAULT_COLLECTION):
     ''' Search for a document within a collection, using either basic or advanced search '''
@@ -105,60 +151,6 @@ def search(request, method='basic', app=DEFAULT_COLLECTION):
     
     # Copy over the queries, e.g. current page number
     queries = request.GET.copy()
-    # If the user is currently on a page other than the first one
-    if 'current_page' in request.GET and isInt(request.GET['current_page']):
-        current_page = int(request.GET['current_page'])
-        del queries['current_page']
-    else:
-        current_page = 1
-    
-    # Determine if the user specified results per page
-    if 'results_per_page' in request.GET and isInt(request.GET['results_per_page']):
-        results_per_page = int(request.GET['results_per_page'])
-    else:
-        results_per_page = 10
-    context['results_per_page'] = results_per_page
-	
-	# Parse for search options
-    start_time = time.time()
-    search_opts = {}
-    if 'title' in form.cleaned_data and form.cleaned_data['title']:
-        search_opts['title__fulltext_terms'] = form.cleaned_data['title']
-    if 'author' in form.cleaned_data and form.cleaned_data['author']:
-        search_opts['author__fulltext_terms'] = form.cleaned_data['author']
-    if 'keyword' in form.cleaned_data and form.cleaned_data['keyword']:
-        search_opts['fulltext_terms'] = form.cleaned_data['keyword']
-    if 'collection' in form.cleaned_data and form.cleaned_data['collection']:
-        if isinstance(form.cleaned_data['collection'],str):
-            search_opts['collection__in'] = COLLECTIONS[form.cleaned_data['collection']]['name']
-        elif isinstance(form.cleaned_data['collection'],list):
-            search_opts['collection__in'] = [COLLECTIONS[m]['name'] for m in form.cleaned_data['collection']]
-    
-    # Get all documents, filter with search options, and order by score
-    pageobjs = Docs.objects.filter(**search_opts).order_by('-fulltext_score')
-    
-    # Order by user-specified criteria, if they do specify it
-    if 'sort_by' in request.GET and len(request.GET['sort_by'])>0:
-        pageobjs = pageobjs.order_by(request.GET['sort_by'])
-        context['sort_by'] = request.GET['sort_by']
-    
-    # Pass queries to context
-    context['queries'] = queries # Current queries
-    
-    # Create paginator safely
-    paginator = Paginator(pageobjs, results_per_page)
-    try:
-        pages = paginator.page(current_page)
-    except PageNotAnInteger:
-        pages = paginator.page(1)
-    except EmptyPage:
-        pages = paginator.page(paginator.num_pages)
-    print time.time() - start_time
-    
-    # Pass a bunch of variables to the template
-    context['pages'] = pages
-    
-    # Render template
     return render_to_response('search.html',context,context_instance=RequestContext(request))
 
 def page(request, doc_id, page, app=DEFAULT_COLLECTION):
