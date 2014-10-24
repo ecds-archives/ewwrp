@@ -13,20 +13,13 @@ a {
 a:hover {
 	text-decoration: underline;
 }
-#collectionmenu {
-    position: relative !important;
-}
 #collectionmenu a:hover {
     text-decoration: none;
-}
-.dropdown-menu > li > a:hover, .dropdown-menu > li > a:focus, .dropdown-submenu:hover > a {
-    background-color: #989898;
-    background-image: none;
-    filter: none;
+    font-style: italic;
 }
 /* Everything relating to the header */
 #header {
-	position: absolute;;
+	position: fixed;
 	left: 0px;
 	right: 0px;
 	top: 0px;

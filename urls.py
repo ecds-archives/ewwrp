@@ -20,9 +20,6 @@ urlpatterns = patterns('ewwrp/views',
     url(r'^(?P<app>\w+)/advancedsearch/$', search, {'method': 'advanced'}, name='advsearch'),
     
     url(r'^(?P<app>\w+)/view/(?P<doc_id>.+)/(?P<page>.+)/$', page, name='page'),
-    
-    # Handles JSON requests
-    url(r'^ajax/$', req, name='ajax'),
         
     url(r'^$', index, name='index'),
     url(r'^(?P<app>\w+)/$', index, name='index'),
