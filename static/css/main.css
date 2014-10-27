@@ -1,10 +1,10 @@
 /* General things */
 @font-face {
-	font-family: Quattrocento;
-	src: url('../fonts/Quattrocento-Regular.ttf');
+	font-family: Raleway;
+	src: url('../fonts/raleway.ttf');
 }
 body {
-	font-family: Quattrocento;
+	font-family: Raleway;
 }
 a {
 	color: white;
@@ -15,21 +15,21 @@ a:hover {
 }
 #collectionmenu a:hover {
     text-decoration: none;
-    font-style: italic;
+    color: black !important;
 }
 /* Everything relating to the header */
 #header {
-	position: fixed;
+	position: absolute;
 	left: 0px;
 	right: 0px;
 	top: 0px;
 	padding: 0px 5px 0px 5px;
 }
 #header-nav {
-	text-align: center;
+	text-align: left;
 	padding: 2px;
 	margin: 0;
-	font-size: 12px;
+	font-size: 18px;
 }
 #header-nav li {
 	display: inline;
@@ -42,9 +42,32 @@ a:hover {
     color: white;
 }
 
+#nav {
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    top: 35px;
+}
+#main-nav {
+    text-align: center;
+    padding: 2px;
+    margin: 0;
+    font-size: 18px;
+}
+#main-nav li {
+    display: inline;
+}
+#main-nav li + li:before {
+    content: " | ";
+    color: black;
+}
+#main-nav a {
+    color: black;
+}
+
 /* Everything relating to the body */
 #body {
-	margin-top: 28px;
+	margin-top: 50px;
 	margin-left: 5px;
 	margin-bottom: 40px;
 }
@@ -94,4 +117,15 @@ a:hover {
 	#footer #rp {
 		width: 70%;
 	}
+}
+.thumbnail-div {
+    color: white;
+    background-color: #2D682F;
+    height: 200px;
+    font-size: 35px;
+    padding: 0px 10px 0px 10px;
+    overflow: hidden;
+}
+.thumb {
+    margin-bottom: 30px;
 }

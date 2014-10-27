@@ -19,7 +19,7 @@
                 <li>
                     <span class="dropdown" id="collectionmenu">
                         <a class="dropdown-toggle" data-toggle="dropdown" style="cursor: pointer;">
-                            Collections
+                            {{ app.name }}
                             <span class="caret" style="margin-bottom: 3px;"></span>
                         </a>
                         <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
@@ -30,13 +30,17 @@
                     </span>
                 </li>
 			{% endif %}
+			</ul>
+		</div>
+        <div id="nav">
+            <ul id="main-nav">
 				<li><a href="{% url 'index' app=app.shortname %}">Home</a></li>
 				<li><a href="{% url 'browse' app=app.shortname %}">Browse</a></li>
 				<li><a href="{% url 'search' app=app.shortname %}">Search</a></li>
 				<li><a href="{% url 'essays' app=app.shortname %}">Essays</a></li>
 				<li><a href="{% url 'about' app=app.shortname %}">About</a></li>
-			</ul>
-		</div>
+            </ul>
+        </div>
 		<div id="body" class="container-fluid">
 			{% block body %}{% endblock %}
 		</div>

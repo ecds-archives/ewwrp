@@ -46,21 +46,20 @@
 {% endblock %}
 
 {% block body %}
-	<div id="text-top">
-		<h1>Emory Women Writers Resource Project</h1>
-		<ul>
-			<li><a href="{% url 'browse' app=app.shortname %}">Browse</a></li>
-			<li><a href="{% url 'search' app=app.shortname %}">Search</a></li>
-			<li><a href="{% url 'essays' app=app.shortname %}">Essays</a></li>
-			<li><a href="{% url 'about' app=app.shortname %}">About</a></li>
-		</ul>
-	</div><br/>
-	<div id="text-bottom">
-		<h1>Collections</h1>
-		<ul>
+    <!-- Page Content -->
+    <div class="container">
+
+        <div class="row">
+            <div class="col-lg-12">
+                <h2>Collections</h1>
+            </div>
             {% for collection in collections.values %}
-            <li><a style="color: #{{ collection.color }};" href={% url 'index' app=collection.shortname %}>{{ collection.name }}</a></li>
+            <div class="col-lg-3 col-md-4 col-xs-6 thumb" style="display: table; table-layout: fixed;">
+                <a class="thumbnail" href="{% url 'index' app=collection.shortname %}" style="text-decoration: none;">
+                    <div class="thumbnail-div" style="background-color: #{{ collection.color }}">{{ collection.name }}</div>
+                </a>
+            </div>
             {% endfor %}
-		</ul>
-	</div>
+        </div>
+    </div>
 {% endblock %}
