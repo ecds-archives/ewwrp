@@ -10,7 +10,7 @@ DEBUG = True
 DATABASES = {'default': {'ENGINE': '', 'NAME': ''}}
 
 # The collections
-DEFAULT_ORDERING = 'author' # Default way to order results
+DEFAULT_ORDERING = 'title' # Default way to order results
 DEFAULT_COLLECTION = 'ewwrp'
 COLLECTIONS = {
     'ewwrp': {

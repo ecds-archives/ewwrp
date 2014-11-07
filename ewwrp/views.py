@@ -17,6 +17,8 @@ from django.template import RequestContext
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
+import lxml.etree as ET
+
 ''' Helper methods for views '''
 def isInt(n):
     ''' Check if a string can be converted to an int or not '''
@@ -51,6 +53,35 @@ def makeURL(**kwargs):
 def importantContextValues(app):
     ''' Values that should be available from any template. This is basically a work-around for managing apps '''
     return {'app': COLLECTIONS[app], 'collections': COLLECTIONS, 'can_sort_by': (('Author','author'), ('Title','title')), 'res_per_page': ((10,10), (20,20), (50,50))}
+
+def makeTOC():
+    ''' Creates a table of contents XML file'''
+    docs = ET.Element('documents')
+    alldocs = Docs.objects.all()
+    for doc in alldocs:
+        current = ET.SubElement(docs, 'document')
+        ET.SubElement(current, 'title').text = doc.title
+        ET.SubElement(current, 'id').text = doc.id
+        ET.SubElement(current, 'author').text = doc.author
+        ET.SubElement(current, 'collection').text = doc.collection
+    
+    # Write the ElementTree to an XML document
+    save_loc = os.path.join(settings.STATICFILES_DIRS[0], 'xml', 'table_of_contents.xml')
+    f = open(save_loc, 'wb')
+    f.write(ET.tostring(docs))
+    f.close()
+    return
+
+def getPages():
+    tree = ET.parse(os.path.join(settings.STATICFILES_DIRS[0], 'xml', 'table_of_contents.xml'))
+    root = tree.getroot()
+    pages = []
+    for item in root:
+        d = {}
+        for child in list(item):
+            d[child.tag] = child.text
+        pages.append(d)
+    return pages
 ''' End helper methods '''
 
 def page(request, doc_id, page, app=DEFAULT_COLLECTION):
@@ -251,6 +282,9 @@ def browse(request, app=DEFAULT_COLLECTION):
         results_per_page = 10
     context['results_per_page'] = results_per_page
     
+    '''
+    # This was the old way, which queries the database directly.
+    # The new way uses a locally stored xml document. Much faster.
     # Get all the documents in the current collection
     if app != DEFAULT_COLLECTION:
         pageobjs = Docs.objects.filter(collection=COLLECTIONS[app]['name']).all()
@@ -265,7 +299,19 @@ def browse(request, app=DEFAULT_COLLECTION):
     else:
         pageobjs = pageobjs.order_by(DEFAULT_ORDERING)
         context['sort_by'] = DEFAULT_ORDERING
-
+    '''
+    
+    pageobjs = getPages()
+    
+    # Filtering based on collection
+    if app != DEFAULT_COLLECTION:
+        pageobjs = [p for p in pageobjs if p['collection'] == COLLECTIONS[app]['name']]
+    
+    # Sorting all the pages
+    if 'sorted_by' in request.GET and len(request.GET['sorted_by'])>0:
+        pageobjs = sorted(pageobjs, key=lambda k: k[request.GET['sorted_by']])
+    else:
+        pageobjs = sorted(pageobjs, key=lambda k: k[DEFAULT_ORDERING])
     # Pass the GET data, minus current page, to the context
     context['queries'] = queries
     
