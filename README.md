@@ -8,10 +8,10 @@ How to start editing (Mac)
 
 If you don't have virtualenv: http://virtualenv.readthedocs.org/en/latest/virtualenv.html
 
-'''
+```
 sudo easy_install pip
 sudo pip install virtualenv
-'''
+```
 
 Create and start a virtual environment:
 
