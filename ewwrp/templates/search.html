@@ -45,7 +45,7 @@
 					<div class="form_label_tag">{{ field.label_tag }}</div><div class="form_field">{{ field }}</div>
 				</div>
 			{% endfor %}
-		{% if advanced %}<a class="adv-search" href="{% url 'search' app=app.shortname %}">Fewer options</a>{% else %}<a class="adv-search" href="{% url 'advsearch' app=app.shortname %}">More options</a>{% endif %}<br/><br/>
+		{% if advanced %}<a class="adv-search" href="{% url 'search' app=app.shortname %}">Normal Search</a>{% else %}<a class="adv-search" href="{% url 'advsearch' app=app.shortname %}">Advanced Search</a>{% endif %}<br/><br/>
 			<input type="submit" value="Search">
 		</form>
 	</div>

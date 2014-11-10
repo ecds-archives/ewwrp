@@ -10,9 +10,6 @@ urlpatterns = patterns('ewwrp/views',
 	url(r'^about/$', about, name='about'),
     url(r'^(?P<app>\w+)/about/$', about, name='about'),
     
-    url(r'^(?P<app>\w+)/essays/$', essays, name='essays'),
-    url(r'^(?P<app>\w+)/essays/(?P<essay_id>)/', essays, name='essays'),
-    
     url(r'^(?P<app>\w+)/browse/$', browse, name='browse'),
     
     url(r'^(?P<app>\w+)/search/$', search, name='search'),

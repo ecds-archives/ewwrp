@@ -14,6 +14,8 @@ class Docs(XmlModel, Tei):
     objects = Manager("//tei:TEI")
     id = xmlmap.StringField('@xml:id')
     divs = xmlmap.NodeListField('//tei:div', TeiDiv)
+    
+    # These are important attributes of each document
     author = xmlmap.StringField('(//tei:author/tei:name/tei:choice/tei:reg | //tei:titleStmt/tei:author/@n)[1]')
     collection = xmlmap.StringField("tei:teiHeader/tei:profileDesc/tei:creation/tei:rs[@type='collection']")
     language = xmlmap.StringField("tei:teiHeader/tei:profileDesc/tei:creation/tei:rs[@type='language']")
@@ -25,8 +27,3 @@ class Docs(XmlModel, Tei):
     
     # Backwords compatibility with tei:list/tei:item
     keywords = xmlmap.StringListField("tei:teiHeader/tei:profileDesc/tei:textClass/tei:keywords/tei:list/tei:item | tei:teiHeader/tei:profileDesc/tei:textClass/tei:keywords/tei:term")
-    
-class Essays(XmlModel, Tei):
-    ROOT_NAMESPACES = {'tei': TEI_NAMESPACE}
-    objects = Manager("//tei:div[@type='critical essay']")
-    collection = xmlmap.StringField("//tei:rs[@type='collection']")

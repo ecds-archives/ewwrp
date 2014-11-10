@@ -2,5 +2,17 @@
 
 {% block body %}
 	<h1>Browse</h1>
+    <table class="table table-bordered">
+    {% for key, value in options.items %}
+        <tr>
+            <td>{{ key|capfirst }}</td>
+            <td>
+                {% for v in value %}
+                <a href="{% url 'browse' app=app.shortname %}?filter={{ key }}&value={{ v }}" style="color: #{{ app.color }}">{{ v }}</a>{% if not forloop.last %}, {% endif %}
+                {% endfor %}
+            </td>
+        </tr>
+    {% endfor %}
+    </table>
 	{% include 'results.html' %}
 {% endblock %}

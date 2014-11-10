@@ -81,7 +81,7 @@ def makeTOC():
     f.close()
     return
 
-def getPages():
+def getPages(collection=None):
     tree = ET.parse(os.path.join(settings.STATICFILES_DIRS[0], 'xml', 'table_of_contents.xml'))
     root = tree.getroot()
     pages = []
@@ -139,57 +139,6 @@ def about(request, app=DEFAULT_COLLECTION):
     context = importantContextValues(app)
     context['page_in_collection'] = 'about'
     return render_to_response('about.html',context,context_instance=RequestContext(request))
-
-def essays(request, essay_id='all', app=DEFAULT_COLLECTION):
-    ''' Essays - still need to make this work, but it should be quick '''
-    context = importantContextValues(app)
-    context['page_in_collection'] = 'essays'
-    
-    # Copy GET info over to a variable
-    queries = request.GET.copy()
-    
-    # If the user is on a certain page, get that page and remove it from the query; otherwise, default to first page
-    if 'current_page' in request.GET and isInt(request.GET['current_page']):
-        current_page = int(request.GET['current_page'])
-        del queries['current_page']
-    else:
-        current_page = 1
-    
-    # If the user specified the number of results per page, use that. Default to 10.
-    if 'results_per_page' in request.GET and isInt(request.GET['results_per_page']):
-        results_per_page = int(request.GET['results_per_page'])
-    else:
-        results_per_page = 10
-    context['results_per_page'] = results_per_page
-    
-    if essay_id == 'all':
-        # Get all the essays in this app
-        filt = {'collection__in': COLLECTIONS[app]['name']}
-        pageobjs = Essays.objects.filter(filt)
-    else:
-        # Get a specific essay and deliver it
-        pageobjs = Essays.objects.get(id=essay_id)
-    
-    # Order by user-specified criteria
-    if 'sort_by' in request.GET and len(request.GET['sort_by'])>0:
-        pageobjs = pageobjs.order_by(request.GET['sort_by'])
-        context['sort_by'] = request.GET['sort_by']
-
-    # Pass the GET data, minus current page, to the context
-    context['queries'] = queries
-    
-    paginator = Paginator(pageobjs, results_per_page)
-
-    try:
-        pages = paginator.page(current_page)
-    except PageNotAnInteger:
-        pages = paginator.page(1)
-    except EmptyPage:
-        pages = paginator.page(paginator.num_pages)
-
-    context['pages'] = pages
-
-    return render_to_response('essays.html',context,context_instance=RequestContext(request))
 
 def search(request, method='basic', app=DEFAULT_COLLECTION):
     ''' Search for a document within a collection, using either basic or advanced search '''
@@ -309,11 +258,31 @@ def browse(request, app=DEFAULT_COLLECTION):
     if app != DEFAULT_COLLECTION:
         pageobjs = [p for p in pageobjs if p['collection'] == COLLECTIONS[app]['name']]
     
+    options = {}
+    
+    # Summarize the collection
+    for p in pageobjs:
+        for key, val in p.iteritems():
+            if not key in ['id','keywords','title','author',]:
+                if not key in options:
+                    options[key] = [val]
+                elif not val in options[key]:
+                    options[key].append(val)
+            elif key in ['title','author',]:
+                if val and len(val)>0:
+                    if not key in options:
+                        options[key] = [val[0]]
+                    elif not val[0] in options[key]:
+                        options[key].append(val[0])
+    
+    context['options'] = options
+    
     # Sorting all the pages
-    if 'sorted_by' in request.GET and len(request.GET['sorted_by'])>0:
-        pageobjs = sorted(pageobjs, key=lambda k: k[request.GET['sorted_by']])
-    else:
-        pageobjs = sorted(pageobjs, key=lambda k: k[DEFAULT_ORDERING])
+#    if 'sorted_by' in request.GET and len(request.GET['sorted_by'])>0:
+#        pageobjs = sorted(pageobjs, key=lambda k: k[request.GET['sorted_by']])
+#    else:
+#        pageobjs = sorted(pageobjs, key=lambda k: k[DEFAULT_ORDERING])
+        
     # Pass the GET data, minus current page, to the context
     context['queries'] = queries
     
