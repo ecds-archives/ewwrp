@@ -64,6 +64,15 @@ def makeTOC():
         ET.SubElement(current, 'id').text = doc.id
         ET.SubElement(current, 'author').text = doc.author
         ET.SubElement(current, 'collection').text = doc.collection
+        ET.SubElement(current, 'language').text = doc.language
+        ET.SubElement(current, 'ethnicity').text = doc.ethnicity
+        ET.SubElement(current, 'form').text = doc.form
+        ET.SubElement(current, 'genre').text = doc.genre
+        ET.SubElement(current, 'geography').text = doc.geography
+        ET.SubElement(current, 'date').text = doc.date
+        k = ET.SubElement(current, 'keywords')
+        for keyword in doc.keywords:
+            ET.SubElement(k, 'term').text = keyword
     
     # Write the ElementTree to an XML document
     save_loc = os.path.join(settings.STATICFILES_DIRS[0], 'xml', 'table_of_contents.xml')
@@ -79,14 +88,18 @@ def getPages():
     for item in root:
         d = {}
         for child in list(item):
-            d[child.tag] = child.text
+            if child.tag == 'keywords':
+                # Since keywords is a list
+                d[child.tag] = ', '.join([c.text for c in child])
+            else:
+                d[child.tag] = child.text
         pages.append(d)
     return pages
 ''' End helper methods '''
 
 def page(request, doc_id, page, app=DEFAULT_COLLECTION):
     ''' Display a specific page '''
-    context = {'app': COLLECTIONS[app]}
+    context = importantContextValues(app)
     context['page_in_collection'] = 'page'
     document = Docs.objects.get(id=doc_id)
     context['document'] = document
@@ -218,7 +231,6 @@ def search(request, method='basic', app=DEFAULT_COLLECTION):
     context['results_per_page'] = results_per_page
 	
 	# Parse for search options
-    start_time = time.time()
     search_opts = {}
     if 'title' in form.cleaned_data and form.cleaned_data['title']:
         search_opts['title__fulltext_terms'] = form.cleaned_data['title']
@@ -231,7 +243,6 @@ def search(request, method='basic', app=DEFAULT_COLLECTION):
             search_opts['collection__in'] = COLLECTIONS[form.cleaned_data['collection']]['name']
         elif isinstance(form.cleaned_data['collection'],list):
             search_opts['collection__in'] = [COLLECTIONS[m]['name'] for m in form.cleaned_data['collection']]
-    print time.time() - start_time
     
     # Get all documents, filter with search options, and order by score
     pageobjs = Docs.objects.filter(**search_opts).order_by('-fulltext_score')
@@ -240,6 +251,8 @@ def search(request, method='basic', app=DEFAULT_COLLECTION):
     if 'sort_by' in request.GET and len(request.GET['sort_by'])>0:
         pageobjs = pageobjs.order_by(request.GET['sort_by'])
         context['sort_by'] = request.GET['sort_by']
+    
+    # pages = {'form': pageobjs.form, 'language': pageobjs.language, 'author': pageobjs.author, 'title': pageobjs.title, 'collection': pageobjs.collection, 'date': pageobjs.date, 'keywords': ', '.join(pageobj.keywords), 'genre': pageobj.genre, 'id': pageobj.id, 'ethnicity': pageobj.ethnicity, 'geography': pageobj.geography}
     
     # Pass queries to context
     context['queries'] = queries # Current queries
@@ -253,8 +266,15 @@ def search(request, method='basic', app=DEFAULT_COLLECTION):
     except EmptyPage:
         pages = paginator.page(paginator.num_pages)
     
+    pages_formatted = []
+    
+    # Create dictionary with desired properties
+    for p in pages:
+        pages_formatted.append({'form': p.form, 'language': p.language, 'author': p.author, 'title': p.title, 'collection': p.collection, 'date': p.date, 'keywords': ', '.join(p.keywords), 'genre': p.genre, 'id': p.id, 'ethnicity': p.ethnicity, 'geography': p.geography})
+    
     # Pass a bunch of variables to the template
-    context['pages'] = pages
+    context['pages'] = pages_formatted
+    context['paginator'] = pages
     
     # Render template
     return render_to_response('search.html',context,context_instance=RequestContext(request))
@@ -282,25 +302,7 @@ def browse(request, app=DEFAULT_COLLECTION):
         results_per_page = 10
     context['results_per_page'] = results_per_page
     
-    '''
-    # This was the old way, which queries the database directly.
-    # The new way uses a locally stored xml document. Much faster.
-    # Get all the documents in the current collection
-    if app != DEFAULT_COLLECTION:
-        pageobjs = Docs.objects.filter(collection=COLLECTIONS[app]['name']).all()
-    else:
-        # If in the default collection don't filter
-        pageobjs = Docs.objects.all()
-    
-    # Order by user-specified criteria
-    if 'sort_by' in request.GET and len(request.GET['sort_by'])>0:
-        pageobjs = pageobjs.order_by(request.GET['sort_by'])
-        context['sort_by'] = request.GET['sort_by']
-    else:
-        pageobjs = pageobjs.order_by(DEFAULT_ORDERING)
-        context['sort_by'] = DEFAULT_ORDERING
-    '''
-    
+    # Read in pages from local XML file
     pageobjs = getPages()
     
     # Filtering based on collection
@@ -325,5 +327,6 @@ def browse(request, app=DEFAULT_COLLECTION):
         pages = paginator.page(paginator.num_pages)
 
     context['pages'] = pages
+    context['paginator'] = pages
 
     return render_to_response('browse.html',context,context_instance=RequestContext(request))

@@ -16,17 +16,17 @@
         <input type="submit" value="Filter">
     </form>
 
-{% if pages.paginator.count > 0 %}
+{% if paginator.paginator.count > 0 %}
     <div class="above-browse">
-		{{ pages.paginator.count }} document{{ pages.paginator.count|pluralize }}. Displaying documents {{ pages.start_index }} - {{ pages.end_index }}.
+		{{ paginator.paginator.count }} document{{ paginator.paginator.count|pluralize }}. Displaying documents {{ paginator.start_index }} - {{ paginator.end_index }}.
 	</div>
 {% endif %}
 
     <ul class="nav nav-justified" style="margin-top: 10px;">
-        <li><a style="padding: 0; margin: 0; background-color: #{{ app.color }}; color: white;" href="{% if pages.number != 1 %}{% url page_in_collection app=app.shortname %}?{{ queries.urlencode }}&current_page=1{% else %}#{% endif %}">First</a></li>
-        <li><a style="padding: 0; margin: 0; background-color: #{{ app.color }}; color: white;" href="{% if pages.has_previous %}{% url page_in_collection app=app.shortname %}?{{ queries.urlencode }}&current_page={{ pages.previous_page_number }}{% else %}#{% endif %}">Previous</a></li>
-        <li><a style="padding: 0; margin: 0; background-color: #{{ app.color }}; color: white;" href="{% if pages.has_next %}{% url page_in_collection app=app.shortname %}?{{ queries.urlencode }}&current_page={{ pages.next_page_number }}{% else %}#{% endif %}">Next</a></li>
-        <li><a style="padding: 0; margin: 0; background-color: #{{ app.color }}; color: white;" href="{% if pages.number != pages.paginator.num_pages %}{% url page_in_collection app=app.shortname %}?{{ queries.urlencode }}&current_page={{ pages.paginator.num_pages }}{% else %}#{% endif %}">Last</a></li>
+        <li><a style="padding: 0; margin: 0; background-color: #{{ app.color }}; color: white;" href="{% if paginator.number != 1 %}{% url page_in_collection app=app.shortname %}?{{ queries.urlencode }}&current_page=1{% else %}#{% endif %}">First</a></li>
+        <li><a style="padding: 0; margin: 0; background-color: #{{ app.color }}; color: white;" href="{% if paginator.has_previous %}{% url page_in_collection app=app.shortname %}?{{ queries.urlencode }}&current_page={{ paginator.previous_page_number }}{% else %}#{% endif %}">Previous</a></li>
+        <li><a style="padding: 0; margin: 0; background-color: #{{ app.color }}; color: white;" href="{% if paginator.has_next %}{% url page_in_collection app=app.shortname %}?{{ queries.urlencode }}&current_page={{ paginator.next_page_number }}{% else %}#{% endif %}">Next</a></li>
+        <li><a style="padding: 0; margin: 0; background-color: #{{ app.color }}; color: white;" href="{% if paginator.number != paginator.paginator.num_pages %}{% url page_in_collection app=app.shortname %}?{{ queries.urlencode }}&current_page={{ paginator.paginator.num_pages }}{% else %}#{% endif %}">Last</a></li>
     </ul>
 
     <!-- Main results div -->
@@ -34,15 +34,46 @@
 		{% for page in pages %}
             <div class="panel-body" style="padding: 5px 0px 5px 0px; margin: 0;">
 				<div class="title"><a style="color: #{{ app.color }}; font-size: 15px; margin: 0; padding: 0;" href="{% url 'page' app=app.shortname doc_id=page.id page='contents' %}">{{ page.title }}</a></div>
-				<div class="details" style="font-size: 13px; margin: 0; padding: 0;">{% if page.author %}{{ page.author }}, {% endif %}{{ page.collection }} Collection</div>
+				<div class="details" style="font-size: 13px; margin: 0; padding: 0;">{% if page.author %}{{ page.author }}, {% endif %}{{ page.collection }} Collection <a href="javascript:showMore('more-{{ page.id }}')" style="color: #{{ app.color }};">More</a></div>
+                <div class="moreDetails" id="more-{{ page.id }}">
+                    <table class="table table-bordered" style="margin-top: 10px;">
+                        {% for key, values in page.items %}
+                        <tr>
+                            <td>{{ key|capfirst }}</td>
+                            <td>{{ values }}</td>
+                        </tr>{% endfor %}
+                    </table>
+                </div>
             </div>
 			{% if not forloop.last %}<hr style="padding: 0; margin: 0;">{% endif %}
 		{% endfor %}
 	</div>
 
-    <ul class="nav nav-justified">
-        <li><a style="padding: 0; margin: 0; background-color: #{{ app.color }}; color: white;" href="{% if pages.number != 1 %}{% url page_in_collection app=app.shortname %}?{{ queries.urlencode }}&current_page=1{% else %}#{% endif %}">First</a></li>
-        <li><a style="padding: 0; margin: 0; background-color: #{{ app.color }}; color: white;" href="{% if pages.has_previous %}{% url page_in_collection app=app.shortname %}?{{ queries.urlencode }}&current_page={{ pages.previous_page_number }}{% else %}#{% endif %}">Previous</a></li>
-        <li><a style="padding: 0; margin: 0; background-color: #{{ app.color }}; color: white;" href="{% if pages.has_next %}{% url page_in_collection app=app.shortname %}?{{ queries.urlencode }}&current_page={{ pages.next_page_number }}{% else %}#{% endif %}">Next</a></li>
-        <li><a style="padding: 0; margin: 0; background-color: #{{ app.color }}; color: white;" href="{% if pages.number != pages.paginator.num_pages %}{% url page_in_collection app=app.shortname %}?{{ queries.urlencode }}&current_page={{ pages.paginator.num_pages }}{% else %}#{% endif %}">Last</a></li>
+    <ul class="nav nav-justified" style="margin-top: 10px;">
+        <li><a style="padding: 0; margin: 0; background-color: #{{ app.color }}; color: white;" href="{% if paginator.number != 1 %}{% url page_in_collection app=app.shortname %}?{{ queries.urlencode }}&current_page=1{% else %}#{% endif %}">First</a></li>
+        <li><a style="padding: 0; margin: 0; background-color: #{{ app.color }}; color: white;" href="{% if paginator.has_previous %}{% url page_in_collection app=app.shortname %}?{{ queries.urlencode }}&current_page={{ paginator.previous_page_number }}{% else %}#{% endif %}">Previous</a></li>
+        <li><a style="padding: 0; margin: 0; background-color: #{{ app.color }}; color: white;" href="{% if paginator.has_next %}{% url page_in_collection app=app.shortname %}?{{ queries.urlencode }}&current_page={{ paginator.next_page_number }}{% else %}#{% endif %}">Next</a></li>
+        <li><a style="padding: 0; margin: 0; background-color: #{{ app.color }}; color: white;" href="{% if paginator.number != paginator.paginator.num_pages %}{% url page_in_collection app=app.shortname %}?{{ queries.urlencode }}&current_page={{ paginator.paginator.num_pages }}{% else %}#{% endif %}">Last</a></li>
     </ul>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('.moreDetails').hide();
+        });
+        // Use the keyboard to navigate
+        $(document).keydown(function(e) {
+            switch(e.which) {
+                case 37: // left
+                    window.location.href = '{% if pages.has_previous %}{% url page_in_collection app=app.shortname %}?{{ queries.urlencode }}&current_page={{ pages.previous_page_number }}{% else %}#{% endif %}';
+                    break;
+                    
+                case 39: // right
+                    window.location.href = '{% if pages.has_next %}{% url page_in_collection app=app.shortname %}?{{ queries.urlencode }}&current_page={{ pages.next_page_number }}{% else %}#{% endif %}';
+                    break;
+            }
+        });
+        function showMore(id) {
+            $('.moreDetails').not('#'+id).slideUp();
+            $("#"+id).slideToggle();
+        }
+    </script>
