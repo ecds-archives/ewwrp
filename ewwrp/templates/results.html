@@ -1,9 +1,12 @@
-{% if paginator.paginator.count > 0 %}
-    <div class="above-browse">
-		{{ paginator.paginator.count }} document{{ paginator.paginator.count|pluralize }}. Displaying documents {{ paginator.start_index }} - {{ paginator.end_index }}.
-	</div>
-{% endif %}
+<div class="above-browse">
+    {% if paginator.paginator.count > 0 %}
+    {{ paginator.paginator.count }} document{{ paginator.paginator.count|pluralize }}. Displaying documents {{ paginator.start_index }} - {{ paginator.end_index }}.
+    {% else %}
+    No results found.
+    {% endif %}
+</div>
 
+    {% if paginator.paginator.count > 0 %}
     <ul class="nav nav-justified" style="margin-top: 10px;">
         <li><a style="padding: 0; margin: 0; background-color: #{{ app.color }}; color: white;" href="{% if paginator.number != 1 %}{% url page_in_collection app=app.shortname %}?{{ queries.urlencode }}&current_page=1{% else %}#{% endif %}">First</a></li>
         <li><a style="padding: 0; margin: 0; background-color: #{{ app.color }}; color: white;" href="{% if paginator.has_previous %}{% url page_in_collection app=app.shortname %}?{{ queries.urlencode }}&current_page={{ paginator.previous_page_number }}{% else %}#{% endif %}">Previous</a></li>
@@ -59,3 +62,4 @@
             $("#"+id).slideToggle();
         }
     </script>
+    {% endif %}

@@ -48,7 +48,7 @@
             Search the full texts of each document by keyword.
             {% else %}
             Search for attributes of each document.
-            {% endif %}
+            {% endif %} Separate entries with a space.
         </div>
 		<form class='search-form' action='{% if advanced %}{% url 'advsearch' app=app.shortname %}{% else %}{% url 'search' app=app.shortname %}{% endif %}' method='get'>
 			{% csrf_token %}

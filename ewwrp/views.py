@@ -178,17 +178,8 @@ def search(request, method='basic', app=DEFAULT_COLLECTION):
         # If advanced, query fulltext terms
         # Parse for search options
         search_opts = {}
-        if 'title' in form.cleaned_data and form.cleaned_data['title']:
-            search_opts['title__fulltext_terms'] = form.cleaned_data['title']
-        if 'author' in form.cleaned_data and form.cleaned_data['author']:
-            search_opts['author__fulltext_terms'] = form.cleaned_data['author']
         if 'keyword' in form.cleaned_data and form.cleaned_data['keyword']:
             search_opts['fulltext_terms'] = form.cleaned_data['keyword']
-        if 'collection' in form.cleaned_data and form.cleaned_data['collection']:
-            if isinstance(form.cleaned_data['collection'],str):
-                search_opts['collection__in'] = COLLECTIONS[form.cleaned_data['collection']]['name']
-            elif isinstance(form.cleaned_data['collection'],list):
-                search_opts['collection__in'] = [COLLECTIONS[m]['name'] for m in form.cleaned_data['collection']]
 
         # Get all documents, filter with search options, and order by score
         pageobjs = Docs.objects.filter(**search_opts).order_by('-fulltext_score')
@@ -261,7 +252,7 @@ def browse(request, app=DEFAULT_COLLECTION):
     # Summarize the collection
     for p in pageobjs:
         for key, val in p.iteritems():
-            if not key in ['id','keywords','title','author',] and val:
+            if not key in ['id','keywords','title','author','collection',] and val:
                 if not key in options:
                     options[key] = [val]
                 elif not val in options[key]:

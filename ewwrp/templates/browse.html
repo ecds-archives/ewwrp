@@ -8,7 +8,7 @@
             <td  class="text-right" style="border: none; width: 100px;">{{ key|capfirst }}</td>
             <td style="border: none;">
                 {% for v in value %}
-                <a href="{% url 'browse' app=app.shortname %}?filter={{ key }}&value={{ v }}" style="color: #{{ app.color }}">{{ v }}</a>
+                <a class="btn btn-default" href="{% url 'browse' app=app.shortname %}?filter={{ key }}&value={{ v }}" style="margin: 1px 0px 1px 0px; padding: 1px 5px 1px 5px; color: #{{ app.color }}">{{ v }}</a>
                 {% endfor %}
             </td>
         </tr>

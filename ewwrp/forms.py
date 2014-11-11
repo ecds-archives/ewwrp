@@ -15,9 +15,10 @@ class SearchForm(forms.Form):
     keywords = forms.CharField(required=False)
     author = forms.CharField(required=False)
     title = forms.CharField(required=False)
+    collection = forms.CharField(required=False)
     
     def clean(self):
-        terms = ['keywords','author','title',]
+        terms = ['keywords','author','title','collection',]
         return generic_clean(self, terms)
     
 class AdvancedSearchForm(forms.Form):
