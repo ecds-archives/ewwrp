@@ -12,13 +12,12 @@ def generic_clean(self, terms):
     raise forms.ValidationError("Please enter search terms.")
 
 class SearchForm(forms.Form):
-    keyword = forms.CharField(required=False)
+    keywords = forms.CharField(required=False)
     author = forms.CharField(required=False)
     title = forms.CharField(required=False)
-    collection = forms.MultipleChoiceField(choices=[(x,y['name']) for x,y in COLLECTIONS.items()], required=False)
     
     def clean(self):
-        terms = ['keyword','author','title','collection',]
+        terms = ['keywords','author','title',]
         return generic_clean(self, terms)
     
 class AdvancedSearchForm(forms.Form):

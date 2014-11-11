@@ -198,7 +198,7 @@ def search(request, method='basic', app=DEFAULT_COLLECTION):
         print form.cleaned_data
         for key in form.cleaned_data:
             if form.cleaned_data[key]:
-                val = form.cleaned_data[key]
+                val = form.cleaned_data[key].lower()
                 val_parts = [x.strip() for x in val.split(' ')]
                 for part in val_parts:
                     pageobjs = [k for k in pageobjs if key in k and isinstance(k[key], str) and part in k[key].lower()]
