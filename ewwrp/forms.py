@@ -13,18 +13,19 @@ def generic_clean(self, terms):
 
 class SearchForm(forms.Form):
     keyword = forms.CharField(required=False)
-    
-    def clean(self):
-        terms = ['keyword']
-        return generic_clean(self, terms)
-    
-class AdvancedSearchForm(forms.Form):
-    keyword = forms.CharField(required=False)
+    author = forms.CharField(required=False)
     title = forms.CharField(required=False)
     collection = forms.MultipleChoiceField(choices=[(x,y['name']) for x,y in COLLECTIONS.items()], required=False)
     
     def clean(self):
-        terms = ['keyword', 'title', 'collection']
+        terms = ['keyword','author','title','collection',]
+        return generic_clean(self, terms)
+    
+class AdvancedSearchForm(forms.Form):
+    keyword = forms.CharField(required=False)
+    
+    def clean(self):
+        terms = ['keyword']
         return generic_clean(self, terms)
 
 class FulltextSearch(forms.Form):

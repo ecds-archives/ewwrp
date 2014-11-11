@@ -35,8 +35,21 @@
 {% endblock %}
 
 {% block body %}
-	<h1>Search</h1>
+	<h1>
+        {% if advanced %}
+        Keyword Search
+        {% else %}
+        Quick Search
+        {% endif %}
+    </h1>
 	<div class="form-div">
+        <div style="padding-bottom: 5px;">
+            {% if advanced %}
+            Search the full texts of each document by keyword.
+            {% else %}
+            Search for attributes of each document.
+            {% endif %}
+        </div>
 		<form class='search-form' action='{% if advanced %}{% url 'advsearch' app=app.shortname %}{% else %}{% url 'search' app=app.shortname %}{% endif %}' method='get'>
 			{% csrf_token %}
 			{% for field in form %}
@@ -45,7 +58,7 @@
 					<div class="form_label_tag">{{ field.label_tag }}</div><div class="form_field">{{ field }}</div>
 				</div>
 			{% endfor %}
-		{% if advanced %}<a class="adv-search" href="{% url 'search' app=app.shortname %}">Normal Search</a>{% else %}<a class="adv-search" href="{% url 'advsearch' app=app.shortname %}">Advanced Search</a>{% endif %}<br/><br/>
+		{% if advanced %}<a class="adv-search" href="{% url 'search' app=app.shortname %}">Quick Search</a>{% else %}<a class="adv-search" href="{% url 'advsearch' app=app.shortname %}">Keyword Search</a>{% endif %}<br/><br/>
 			<input type="submit" value="Search">
 		</form>
 	</div>

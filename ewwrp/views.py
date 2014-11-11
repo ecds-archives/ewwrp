@@ -90,7 +90,7 @@ def getPages(collection=None):
         for child in list(item):
             if child.tag == 'keywords':
                 # Since keywords is a list
-                d[child.tag] = ', '.join([c.text for c in child])
+                d[child.tag] = ' '.join([c.text for c in child])
             else:
                 d[child.tag] = child.text
         pages.append(d)
@@ -156,6 +156,8 @@ def search(request, method='basic', app=DEFAULT_COLLECTION):
         if request.GET: form = SearchForm(request.GET)
         else: form = SearchForm()
     
+    results_per_page = 10
+    
     # Pass the form variable to the context instance
     context['form'] = form
     
@@ -172,27 +174,34 @@ def search(request, method='basic', app=DEFAULT_COLLECTION):
     else:
         current_page = 1
     
-	# Parse for search options
-    search_opts = {}
-    if 'title' in form.cleaned_data and form.cleaned_data['title']:
-        search_opts['title__fulltext_terms'] = form.cleaned_data['title']
-    if 'author' in form.cleaned_data and form.cleaned_data['author']:
-        search_opts['author__fulltext_terms'] = form.cleaned_data['author']
-    if 'keyword' in form.cleaned_data and form.cleaned_data['keyword']:
-        search_opts['fulltext_terms'] = form.cleaned_data['keyword']
-    if 'collection' in form.cleaned_data and form.cleaned_data['collection']:
-        if isinstance(form.cleaned_data['collection'],str):
-            search_opts['collection__in'] = COLLECTIONS[form.cleaned_data['collection']]['name']
-        elif isinstance(form.cleaned_data['collection'],list):
-            search_opts['collection__in'] = [COLLECTIONS[m]['name'] for m in form.cleaned_data['collection']]
-    
-    # Get all documents, filter with search options, and order by score
-    pageobjs = Docs.objects.filter(**search_opts).order_by('-fulltext_score')
-    
-    # pages = {'form': pageobjs.form, 'language': pageobjs.language, 'author': pageobjs.author, 'title': pageobjs.title, 'collection': pageobjs.collection, 'date': pageobjs.date, 'keywords': ', '.join(pageobj.keywords), 'genre': pageobj.genre, 'id': pageobj.id, 'ethnicity': pageobj.ethnicity, 'geography': pageobj.geography}
-    
-    # Pass queries to context
-    context['queries'] = queries # Current queries
+    if method == 'advanced':
+        # If advanced, query fulltext terms
+        # Parse for search options
+        search_opts = {}
+        if 'title' in form.cleaned_data and form.cleaned_data['title']:
+            search_opts['title__fulltext_terms'] = form.cleaned_data['title']
+        if 'author' in form.cleaned_data and form.cleaned_data['author']:
+            search_opts['author__fulltext_terms'] = form.cleaned_data['author']
+        if 'keyword' in form.cleaned_data and form.cleaned_data['keyword']:
+            search_opts['fulltext_terms'] = form.cleaned_data['keyword']
+        if 'collection' in form.cleaned_data and form.cleaned_data['collection']:
+            if isinstance(form.cleaned_data['collection'],str):
+                search_opts['collection__in'] = COLLECTIONS[form.cleaned_data['collection']]['name']
+            elif isinstance(form.cleaned_data['collection'],list):
+                search_opts['collection__in'] = [COLLECTIONS[m]['name'] for m in form.cleaned_data['collection']]
+
+        # Get all documents, filter with search options, and order by score
+        pageobjs = Docs.objects.filter(**search_opts).order_by('-fulltext_score')
+    else:
+        # If not advanced, run quick search
+        pageobjs = getPages()
+        print form.cleaned_data
+        for key in form.cleaned_data:
+            if form.cleaned_data[key]:
+                val = form.cleaned_data[key]
+                val_parts = [x.strip() for x in val.split(' ')]
+                for part in val_parts:
+                    pageobjs = [k for k in pageobjs if key in k and isinstance(k[key], str) and part in k[key].lower()]
     
     # Create paginator safely
     paginator = Paginator(pageobjs, results_per_page)
@@ -205,9 +214,15 @@ def search(request, method='basic', app=DEFAULT_COLLECTION):
     
     pages_formatted = []
     
-    # Create dictionary with desired properties
-    for p in pages:
-        pages_formatted.append({'form': p.form, 'language': p.language, 'author': p.author, 'title': p.title, 'collection': p.collection, 'date': p.date, 'keywords': ', '.join(p.keywords), 'genre': p.genre, 'id': p.id, 'ethnicity': p.ethnicity, 'geography': p.geography})
+    if method == 'advanced':
+        # Create dictionary with desired properties
+        for p in pages:
+            pages_formatted.append({'form': p.form, 'language': p.language, 'author': p.author, 'title': p.title, 'collection': p.collection, 'date': p.date, 'keywords': ' '.join(p.keywords), 'genre': p.genre, 'id': p.id, 'ethnicity': p.ethnicity, 'geography': p.geography})
+    else:
+        pages_formatted = pages
+    
+    # Pass queries to context
+    context['queries'] = queries # Current queries
     
     # Pass a bunch of variables to the template
     context['pages'] = pages_formatted
@@ -271,7 +286,7 @@ def browse(request, app=DEFAULT_COLLECTION):
         else:
             pageobjs = [k for k in pageobjs if k[filt] == val]
     
-    # Sort pageobjs by author
+    # Sort pageobjs by title
     pageobjs = sorted(pageobjs, key=lambda k: k['title'])
     
     context['options'] = options

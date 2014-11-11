@@ -5,7 +5,7 @@
     <table class="table">
     {% for key, value in options.items %}
         <tr>
-            <td class="text-right" style="border: none;">{{ key|capfirst }}</td>
+            <td  class="text-right" style="border: none; width: 100px;">{{ key|capfirst }}</td>
             <td style="border: none;">
                 {% for v in value %}
                 <a href="{% url 'browse' app=app.shortname %}?filter={{ key }}&value={{ v }}" style="color: #{{ app.color }}">{{ v }}</a>
