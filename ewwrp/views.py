@@ -172,13 +172,6 @@ def search(request, method='basic', app=DEFAULT_COLLECTION):
     else:
         current_page = 1
     
-    # Determine if the user specified results per page
-    if 'results_per_page' in request.GET and isInt(request.GET['results_per_page']):
-        results_per_page = int(request.GET['results_per_page'])
-    else:
-        results_per_page = 10
-    context['results_per_page'] = results_per_page
-	
 	# Parse for search options
     search_opts = {}
     if 'title' in form.cleaned_data and form.cleaned_data['title']:
@@ -195,11 +188,6 @@ def search(request, method='basic', app=DEFAULT_COLLECTION):
     
     # Get all documents, filter with search options, and order by score
     pageobjs = Docs.objects.filter(**search_opts).order_by('-fulltext_score')
-    
-    # Order by user-specified criteria, if they do specify it
-    if 'sort_by' in request.GET and len(request.GET['sort_by'])>0:
-        pageobjs = pageobjs.order_by(request.GET['sort_by'])
-        context['sort_by'] = request.GET['sort_by']
     
     # pages = {'form': pageobjs.form, 'language': pageobjs.language, 'author': pageobjs.author, 'title': pageobjs.title, 'collection': pageobjs.collection, 'date': pageobjs.date, 'keywords': ', '.join(pageobj.keywords), 'genre': pageobj.genre, 'id': pageobj.id, 'ethnicity': pageobj.ethnicity, 'geography': pageobj.geography}
     
@@ -243,13 +231,8 @@ def browse(request, app=DEFAULT_COLLECTION):
         del queries['current_page']
     else:
         current_page = 1
-    
-    # If the user specified the number of results per page, use that. Default to 10.
-    if 'results_per_page' in request.GET and isInt(request.GET['results_per_page']):
-        results_per_page = int(request.GET['results_per_page'])
-    else:
-        results_per_page = 10
-    context['results_per_page'] = results_per_page
+        
+    results_per_page = 10
     
     # Read in pages from local XML file
     pageobjs = getPages()
@@ -263,26 +246,36 @@ def browse(request, app=DEFAULT_COLLECTION):
     # Summarize the collection
     for p in pageobjs:
         for key, val in p.iteritems():
-            if not key in ['id','keywords','title','author',]:
+            if not key in ['id','keywords','title','author',] and val:
                 if not key in options:
                     options[key] = [val]
                 elif not val in options[key]:
                     options[key].append(val)
             elif key in ['title','author',]:
-                if val and len(val)>0:
+                if val and len(val)>0 and val[0].isalpha():
                     if not key in options:
                         options[key] = [val[0]]
                     elif not val[0] in options[key]:
                         options[key].append(val[0])
     
+    # Sort each option
+    for key in options:
+        options[key] = sorted(options[key])
+    
+    # Filter by value passed to user
+    filt = request.GET.get('filter', False)
+    val = request.GET.get('value', False)
+    if filt and val:
+        if filt in ['title', 'author']:
+            pageobjs = [k for k in pageobjs if k[filt] and k[filt][0] == val]
+        else:
+            pageobjs = [k for k in pageobjs if k[filt] == val]
+    
+    # Sort pageobjs by author
+    pageobjs = sorted(pageobjs, key=lambda k: k['title'])
+    
     context['options'] = options
     
-    # Sorting all the pages
-#    if 'sorted_by' in request.GET and len(request.GET['sorted_by'])>0:
-#        pageobjs = sorted(pageobjs, key=lambda k: k[request.GET['sorted_by']])
-#    else:
-#        pageobjs = sorted(pageobjs, key=lambda k: k[DEFAULT_ORDERING])
-        
     # Pass the GET data, minus current page, to the context
     context['queries'] = queries
     

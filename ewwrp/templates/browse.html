@@ -2,13 +2,13 @@
 
 {% block body %}
 	<h1>Browse</h1>
-    <table class="table table-bordered">
+    <table class="table">
     {% for key, value in options.items %}
         <tr>
-            <td>{{ key|capfirst }}</td>
-            <td>
+            <td class="text-right" style="border: none;">{{ key|capfirst }}</td>
+            <td style="border: none;">
                 {% for v in value %}
-                <a href="{% url 'browse' app=app.shortname %}?filter={{ key }}&value={{ v }}" style="color: #{{ app.color }}">{{ v }}</a>{% if not forloop.last %}, {% endif %}
+                <a href="{% url 'browse' app=app.shortname %}?filter={{ key }}&value={{ v }}" style="color: #{{ app.color }}">{{ v }}</a>
                 {% endfor %}
             </td>
         </tr>

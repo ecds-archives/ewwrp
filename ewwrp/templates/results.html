@@ -1,21 +1,3 @@
-    <!-- ORDER AND NUMBER OF RESULTS -->
-    <form action='{% url page_in_collection app=app.shortname %}'>
-        Order by <select name="sort_by">
-        {% for name, val in can_sort_by %}
-            <option value="{{ val }}"{% if sort_by == val %} selected{% endif %}>{{ name }}</option>
-        {% endfor %}
-        </select>
-        and display <select name="results_per_page">
-        {% for num, val in res_per_page %}
-            <option value="{{ val }}"{% if results_per_page == val %} selected{% endif %}>{{ num }}</option>
-        {% endfor %}
-        </select> results.
-        {% for key, val in queries.items %}
-        {% if key != 'sort_by' and key != 'results_per_page' %}<input type="hidden" name="{{ key }}" value="{{ val }}">{% endif %}
-        {% endfor %}
-        <input type="submit" value="Filter">
-    </form>
-
 {% if paginator.paginator.count > 0 %}
     <div class="above-browse">
 		{{ paginator.paginator.count }} document{{ paginator.paginator.count|pluralize }}. Displaying documents {{ paginator.start_index }} - {{ paginator.end_index }}.
