@@ -40,7 +40,7 @@
         <li><a style="padding: 0; margin: 0; background-color: #{{ app.color }}; color: white;" href="{% if paginator.has_next %}{% url page_in_collection app=app.shortname %}?{{ queries.urlencode }}&current_page={{ paginator.next_page_number }}{% else %}#{% endif %}">Next</a></li>
         <li><a style="padding: 0; margin: 0; background-color: #{{ app.color }}; color: white;" href="{% if paginator.number != paginator.paginator.num_pages %}{% url page_in_collection app=app.shortname %}?{{ queries.urlencode }}&current_page={{ paginator.paginator.num_pages }}{% else %}#{% endif %}">Last</a></li>
     </ul>
-
+<!--
     <script type="text/javascript">
         $(document).ready(function() {
             $('.moreDetails').hide();
@@ -62,4 +62,5 @@
             $("#"+id).slideToggle();
         }
     </script>
+-->
     {% endif %}
