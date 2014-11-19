@@ -55,7 +55,7 @@
             </div>
             {% for collection in collections.values %}
             <div class="col-lg-3 col-md-4 col-xs-12 thumb" style="display: table; table-layout: fixed; font-family: Raleway;">
-                <a class="thumbnail" href="{% url 'index' app=collection.shortname %}" style="text-decoration: none;">
+                <a class="thumbnail" href="{% url 'browse' app=collection.shortname %}" style="text-decoration: none;">
                     <div class="thumbnail-div" style="background-color: #{{ collection.color }}">{{ collection.name }}</div>
                 </a>
             </div>

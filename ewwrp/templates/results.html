@@ -40,11 +40,15 @@
         <li><a style="padding: 0; margin: 0; background-color: #{{ app.color }}; color: white;" href="{% if paginator.has_next %}{% url page_in_collection app=app.shortname %}?{{ queries.urlencode }}&current_page={{ paginator.next_page_number }}{% else %}#{% endif %}">Next</a></li>
         <li><a style="padding: 0; margin: 0; background-color: #{{ app.color }}; color: white;" href="{% if paginator.number != paginator.paginator.num_pages %}{% url page_in_collection app=app.shortname %}?{{ queries.urlencode }}&current_page={{ paginator.paginator.num_pages }}{% else %}#{% endif %}">Last</a></li>
     </ul>
-<!--
     <script type="text/javascript">
         $(document).ready(function() {
             $('.moreDetails').hide();
         });
+        function showMore(id) {
+            //$('.moreDetails').not('#'+id).slideUp();
+            $("#"+id).slideToggle();
+        }
+        /*
         // Use the keyboard to navigate
         $(document).keydown(function(e) {
             switch(e.which) {
@@ -56,11 +60,6 @@
                     window.location.href = '{% if pages.has_next %}{% url page_in_collection app=app.shortname %}?{{ queries.urlencode }}&current_page={{ pages.next_page_number }}{% else %}#{% endif %}';
                     break;
             }
-        });
-        function showMore(id) {
-            $('.moreDetails').not('#'+id).slideUp();
-            $("#"+id).slideToggle();
-        }
+        });*/
     </script>
--->
     {% endif %}
