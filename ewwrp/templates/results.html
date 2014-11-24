@@ -1,4 +1,4 @@
-<div class="above-browse">
+<div class="above-browse" style="padding-bottom: 20px;">
     {% if paginator.paginator.count > 0 %}
     {{ paginator.paginator.count }} document{{ paginator.paginator.count|pluralize }}. Displaying documents {{ paginator.start_index }} - {{ paginator.end_index }}.
     {% else %}
@@ -7,18 +7,28 @@
 </div>
 
     {% if paginator.paginator.count > 0 %}
-    <ul class="nav nav-justified" style="margin-top: 10px;">
-        <li><a style="padding: 0; margin: 0; background-color: #{{ app.color }}; color: white;" href="{% if paginator.number != 1 %}{% url page_in_collection app=app.shortname %}?{{ queries.urlencode }}&current_page=1{% else %}#{% endif %}">First</a></li>
-        <li><a style="padding: 0; margin: 0; background-color: #{{ app.color }}; color: white;" href="{% if paginator.has_previous %}{% url page_in_collection app=app.shortname %}?{{ queries.urlencode }}&current_page={{ paginator.previous_page_number }}{% else %}#{% endif %}">Previous</a></li>
-        <li><a style="padding: 0; margin: 0; background-color: #{{ app.color }}; color: white;" href="{% if paginator.has_next %}{% url page_in_collection app=app.shortname %}?{{ queries.urlencode }}&current_page={{ paginator.next_page_number }}{% else %}#{% endif %}">Next</a></li>
-        <li><a style="padding: 0; margin: 0; background-color: #{{ app.color }}; color: white;" href="{% if paginator.number != paginator.paginator.num_pages %}{% url page_in_collection app=app.shortname %}?{{ queries.urlencode }}&current_page={{ paginator.paginator.num_pages }}{% else %}#{% endif %}">Last</a></li>
-    </ul>
+    <div class="container-fluid">
+        <a class="btn btn-default pull-left" href="{% if paginator.number != 1 %}{% url page_in_collection app=app.shortname %}?{{ queries.urlencode }}&current_page=1{% else %}#{% endif %}">
+            <span class="glyphicon glyphicon-chevron-left"></span>
+            <span class="glyphicon glyphicon-chevron-left"></span>
+        </a>
+        <a style="margin-left: 8px;" class="btn btn-default pull-left" href="{% if paginator.has_previous %}{% url page_in_collection app=app.shortname %}?{{ queries.urlencode }}&current_page={{ paginator.previous_page_number }}{% else %}#{% endif %}">
+            <span class="glyphicon glyphicon-chevron-left"></span>
+        </a>
+        <a class="btn btn-default pull-right" href="{% if paginator.number != paginator.paginator.num_pages %}{% url page_in_collection app=app.shortname %}?{{ queries.urlencode }}&current_page={{ paginator.paginator.num_pages }}{% else %}#{% endif %}">
+            <span class="glyphicon glyphicon-chevron-right"></span>
+            <span class="glyphicon glyphicon-chevron-right"></span>
+        </a>
+        <a style="margin-right: 8px;" class="btn btn-default pull-right" href="{% if paginator.has_next %}{% url page_in_collection app=app.shortname %}?{{ queries.urlencode }}&current_page={{ paginator.next_page_number }}{% else %}#{% endif %}">
+            <span class="glyphicon glyphicon-chevron-right"></span>
+        </a>
+    </div>
 
     <!-- Main results div -->
-	<div class="browse-results">
+	<div class="browse-results container-fluid">
 		{% for page in pages %}
-            <div class="panel-body" style="padding: 5px 0px 5px 0px; margin: 0;">
-				<div class="title"><a style="color: #{{ app.color }}; font-size: 15px; margin: 0; padding: 0;" href="{% url 'page' app=app.shortname doc_id=page.id page='contents' %}">{{ page.title }}</a></div>
+            <div class="panel-body" style="padding: 20px 0px 20px 0px; margin: 0;">
+				<div class="title"><a style="color: #{{ app.color }}; font-size: 15px; font-weight: bold; margin: 0; padding: 0;" href="{% url 'page' app=app.shortname doc_id=page.id page='contents' %}">{{ page.title|truncatechars:100 }}</a></div>
 				<div class="details" style="font-size: 13px; margin: 0; padding: 0;">{% if page.author %}{{ page.author }}, {% endif %}{{ page.collection }} Collection <a href="javascript:showMore('more-{{ page.id }}')" style="color: #{{ app.color }};">More</a></div>
                 <div class="moreDetails" id="more-{{ page.id }}">
                     <table class="table table-bordered" style="margin-top: 10px;">
@@ -34,12 +44,23 @@
 		{% endfor %}
 	</div>
 
-    <ul class="nav nav-justified" style="margin-top: 10px;">
-        <li><a style="padding: 0; margin: 0; background-color: #{{ app.color }}; color: white;" href="{% if paginator.number != 1 %}{% url page_in_collection app=app.shortname %}?{{ queries.urlencode }}&current_page=1{% else %}#{% endif %}">First</a></li>
-        <li><a style="padding: 0; margin: 0; background-color: #{{ app.color }}; color: white;" href="{% if paginator.has_previous %}{% url page_in_collection app=app.shortname %}?{{ queries.urlencode }}&current_page={{ paginator.previous_page_number }}{% else %}#{% endif %}">Previous</a></li>
-        <li><a style="padding: 0; margin: 0; background-color: #{{ app.color }}; color: white;" href="{% if paginator.has_next %}{% url page_in_collection app=app.shortname %}?{{ queries.urlencode }}&current_page={{ paginator.next_page_number }}{% else %}#{% endif %}">Next</a></li>
-        <li><a style="padding: 0; margin: 0; background-color: #{{ app.color }}; color: white;" href="{% if paginator.number != paginator.paginator.num_pages %}{% url page_in_collection app=app.shortname %}?{{ queries.urlencode }}&current_page={{ paginator.paginator.num_pages }}{% else %}#{% endif %}">Last</a></li>
-    </ul>
+    <div class="container-fluid">
+        <a class="btn btn-default pull-left" href="{% if paginator.number != 1 %}{% url page_in_collection app=app.shortname %}?{{ queries.urlencode }}&current_page=1{% else %}#{% endif %}">
+            <span class="glyphicon glyphicon-chevron-left"></span>
+            <span class="glyphicon glyphicon-chevron-left"></span>
+        </a>
+        <a style="margin-left: 8px;" class="btn btn-default pull-left" href="{% if paginator.has_previous %}{% url page_in_collection app=app.shortname %}?{{ queries.urlencode }}&current_page={{ paginator.previous_page_number }}{% else %}#{% endif %}">
+            <span class="glyphicon glyphicon-chevron-left"></span>
+        </a>
+        <a class="btn btn-default pull-right" href="{% if paginator.number != paginator.paginator.num_pages %}{% url page_in_collection app=app.shortname %}?{{ queries.urlencode }}&current_page={{ paginator.paginator.num_pages }}{% else %}#{% endif %}">
+            <span class="glyphicon glyphicon-chevron-right"></span>
+            <span class="glyphicon glyphicon-chevron-right"></span>
+        </a>
+        <a style="margin-right: 8px;" class="btn btn-default pull-right" href="{% if paginator.has_next %}{% url page_in_collection app=app.shortname %}?{{ queries.urlencode }}&current_page={{ paginator.next_page_number }}{% else %}#{% endif %}">
+            <span class="glyphicon glyphicon-chevron-right"></span>
+        </a>
+    </div>
+
     <script type="text/javascript">
         $(document).ready(function() {
             $('.moreDetails').hide();

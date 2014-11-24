@@ -278,7 +278,7 @@ def browse(request, app=DEFAULT_COLLECTION):
             pageobjs = [k for k in pageobjs if k[filt] == val]
     
     # Sort pageobjs by title
-    pageobjs = sorted(pageobjs, key=lambda k: k['title'])
+    pageobjs = sorted(pageobjs, key=lambda k: k['author'])
     
     context['options'] = options
     
