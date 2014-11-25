@@ -1,26 +1,37 @@
 {% extends 'base.html' %}
 {% block head %}
 	<style>
+        .doc-info {
+            text-align: center;
+        }
 		.doc-info .title {
-			font-size: 25px;
+			font-size: 55px;
+            padding-top: 100px;
 		}
+        .doc-info .author {
+            font-size: 30px;
+            padding-top: 20px;
+        }
+        
+        .doc-main ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .doc-main li {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            text-align: center;
+        }
+        
         .doc-info a {
 			color: #{{ app.color }};
         }
 		.doc-main a {
 			color: #{{ app.color }};
 		}
-        .page-nav {
-            margin: 0;
-            padding: 0;
-            list-style-type: none;
-        }
-        .page-nav li {
-            display: inline;
-        }
-        .page-nav li+li:before {
-            content: " | ";
-        }
 	</style>
 	{% load staticfiles %}
 	<link rel="stylesheet" href="{% static 'css/tei.css' %}">
@@ -28,21 +39,20 @@
 
 {% block body %}
 	{% if document %}
-		<div class="doc-info">
-			{% if document.title %}<div class="title">{{ document.title }}</div>{% endif %}
-			{% if document.author %}<div class="author">By {{ document.author }}</div>{% endif %}
-			{% if document.editor %}<div class="editor">Edited by {{ document.editor }}</div>{% endif %}
-            {% if page != 'contents' %}
-            <ul class="page-nav">
-                <li><a href="{% url 'page' app=app.shortname doc_id=document.id page='contents' %}">Return to Table of Contents</a></li>
-                {% if prev_id %}<li><a href="{% url 'page' app=app.shortname doc_id=document.id page=prev_id %}">Previous</a></li>{% endif %}
-                {% if next_id %}<li><a href="{% url 'page' app=app.shortname doc_id=document.id page=next_id %}">Next</a></li>{% endif %}
-            </ul>
-            {% endif %}
-		</div>
-		<hr style="margin-bottom: 30px;" />
 		<div class="doc-main">
 			{% if page == 'contents' %}
+            <div class="doc-info">
+                {% if document.title %}<div class="title">{{ document.title }}</div>{% endif %}
+                {% if document.author %}<div class="author">By {{ document.author }}</div>{% endif %}
+                {% if page != 'contents' %}
+                <ul class="page-nav">
+                    <li><a href="{% url 'page' app=app.shortname doc_id=document.id page='contents' %}">Return to Table of Contents</a></li>
+                    {% if prev_id %}<li><a href="{% url 'page' app=app.shortname doc_id=document.id page=prev_id %}">Previous</a></li>{% endif %}
+                    {% if next_id %}<li><a href="{% url 'page' app=app.shortname doc_id=document.id page=next_id %}">Next</a></li>{% endif %}
+                </ul>
+                {% endif %}
+            </div>
+            <hr style="margin-bottom: 30px;" />
 			<ul>
                 <!-- Front of the document -->
 				{% if document.front.div %}

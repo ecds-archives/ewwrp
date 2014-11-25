@@ -63,22 +63,23 @@
                     </ul>
                     {% if document %}
                     <ul class="nav nav-sidebar">
+                        <li><a href="{% url 'page' app=app.shortname doc_id=document.id page='contents' %}">Table of Contents</a></li>
                         {% for div in document.front.div %}
                         <li><a href="{% url 'page' app=app.shortname doc_id=document.id page=div.id %}">{{ div.title_list|join:", " }}</a></li>
                             {% for subdiv in div.div %}
-                            <li><a style="padding-left: 30px;" href="{% url 'page' app=app.shortname doc_id=document.id page=subdiv.id %}">{{ subdiv.title_list|join:", "}}</a></li>
+                            <li><a style="padding-left: 40px;" href="{% url 'page' app=app.shortname doc_id=document.id page=subdiv.id %}">{{ subdiv.title_list|join:", "}}</a></li>
                             {% endfor %}
                         {% endfor %}
                         {% for div in document.body.div %}
-                        <li><a href="{% url 'page' app=app.shortname doc_id=document.id page=div.id %}">{{ div.title_list|join:", " }}</a></li>
+                        <li><a href="{% url 'page' app=app.shortname doc_id=document.id page=div.id %}">{{ div.title_list|join:", "|striptags|truncatewords:5 }}</a></li>
                             {% for subdiv in div.div %}
-                            <li><a style="padding-left: 30px;" href="{% url 'page' app=app.shortname doc_id=document.id page=subdiv.id %}">{{ subdiv.title_list|join:", "}}</a></li>
+                            <li><a style="padding-left: 40px;" href="{% url 'page' app=app.shortname doc_id=document.id page=subdiv.id %}">{{ subdiv.title_list|join:", "}}</a></li>
                             {% endfor %}
                         {% endfor %}
                         {% for div in document.back.div %}
                         <li><a href="{% url 'page' app=app.shortname doc_id=document.id page=div.id %}">{{ div.title_list|join:", " }}</a></li>
                             {% for subdiv in div.div %}
-                            <li><a style="padding-left: 30px;" href="{% url 'page' app=app.shortname doc_id=document.id page=subdiv.id %}">{{ subdiv.title_list|join:", "}}</a></li>
+                            <li><a style="padding-left: 40px;" href="{% url 'page' app=app.shortname doc_id=document.id page=subdiv.id %}">{{ subdiv.title_list|join:", "}}</a></li>
                             {% endfor %}
                         {% endfor %}
                     </ul>
