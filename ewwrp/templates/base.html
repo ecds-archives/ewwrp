@@ -21,23 +21,8 @@
 		<div id="header">
 			<ul id="header-nav">
                 <li>
-                    <span class="dropdown" id="collectionmenu">
-			            {% if page_in_collection != 'page' %}
-                        <a class="dropdown-toggle" data-toggle="dropdown" style="cursor: pointer;">
-                            {{ app.name }}
-                            <span class="caret" style="margin-bottom: 3px;"></span>
-                        </a>
-                        <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
-                            {% for collection in collections.values %}
-                            <li role="presentation"><a href="{% url page_in_collection app=collection.shortname %}" {% if app == collection %}style="color:white; background-color:#{{ collection.color }};{% endif %}" role="menuitem" tabindex="-1" href="#">{{ collection.name }}</a></li>
-                            {% endfor %}
-                        </ul>
-                        {% else %}
-                        <a style="cursor: pointer;">
-                            {{ app.name }}
-                        </a>
-			            {% endif %}
-                    </span>
+                    <div class="dropdown" id="collectionmenu">
+                    </div>
                 </li>
 			</ul>
 		</div>
@@ -61,7 +46,18 @@
                         <li><a href="{% url 'search' app=app.shortname %}">Search</a></li>
                         <li><a href="{% url 'about' app=app.shortname %}">About</a></li>
                     </ul>
+                    
+                    {% if page_in_collection != 'page' %}
+                    <hr style="margin: 10px 0 10px 0; padding: 0; display: block; height: 1px; border: 0; border-top: 1px solid #{{ app.color }};"/>
+                    <ul class="nav nav-sidebar">
+                        {% for collection in collections.values %}
+                        <li><a href="{% url page_in_collection app=collection.shortname %}" {% if app == collection %}style="color:white; background-color:#{{ collection.color }};{% endif %}" role="menuitem" tabindex="-1" href="#">{{ collection.name }}</a></li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                    
                     {% if document %}
+                    <hr style="margin: 10px 0 10px 0; padding: 0; display: block; height: 1px; border: 0; border-top: 1px solid #{{ app.color }};"/>
                     <ul class="nav nav-sidebar">
                         <li><a href="{% url 'page' app=app.shortname doc_id=document.id page='contents' %}">Table of Contents</a></li>
                         {% for div in document.front.div %}
@@ -86,7 +82,7 @@
                     {% endif %}
                 </div>
                 <!-- Main stuff -->
-                <div id="body" class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+                <div id="body" class="col-sm-offset-3 col-md-offset-2 main">
                     {% block body %}{% endblock %}
                 </div>
             </div>

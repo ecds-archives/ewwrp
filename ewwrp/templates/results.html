@@ -7,6 +7,17 @@
 </div>
 
     {% if paginator.paginator.count > 0 %}
+    <div class="dropdown" style="margin-bottom: 30px;">
+        <button class="btn btn-default dropdown-toggle" type="button" id="ddm" data-toggle="dropdown" aria-expanded="true">
+            Go To Page <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" role="menu" aria-labelledby="ddm">
+            {% for page in paginator.paginator.page_range %}
+                <li><a href="{% url page_in_collection app=app.shortname %}?{{ queries.urlencode}}&current_page={{ page }}">{{ page }}</a></li>
+            {% endfor %}
+        </ul>
+    </div>
+
     <div class="container-fluid">
         <a class="btn btn-default pull-left" href="{% if paginator.number != 1 %}{% url page_in_collection app=app.shortname %}?{{ queries.urlencode }}&current_page=1{% else %}#{% endif %}">
             <span class="glyphicon glyphicon-chevron-left"></span>

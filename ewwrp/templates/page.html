@@ -32,6 +32,16 @@
 		.doc-main a {
 			color: #{{ app.color }};
 		}
+        
+        .contents-items div {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .contents-items a {
+            width: 100%;
+            display: block;
+            margin-bottom: 5px;
+        }
 	</style>
 	{% load staticfiles %}
 	<link rel="stylesheet" href="{% static 'css/tei.css' %}">
@@ -41,50 +51,45 @@
 	{% if document %}
 		<div class="doc-main">
 			{% if page == 'contents' %}
-            <div class="doc-info">
+                <div class="doc-info">
                 {% if document.title %}<div class="title">{{ document.title }}</div>{% endif %}
                 {% if document.author %}<div class="author">By {{ document.author }}</div>{% endif %}
+                </div>
+
+                <hr style="margin-bottom: 30px;" />
+                <div class="contents-items">
+                <!-- Front of the document -->
+                {% if document.front.div %}
+                    <div class="item">Front</div>
+                    {% for div in document.front.div %}
+                        <div><a href="{% url 'page' app=app.shortname doc_id=document.id page=div.id %}">{{ div.type|capfirst }}</a></div>
+                    {% endfor %}
+                {% endif %}
+
+                <!-- Body of the document -->
+                {% for div in document.body.div %}
+                    <div><a href="{% url 'page' app=app.shortname doc_id=document.id page=div.id %}">{{ div.title_list|join:", " }}</a></div>
+                    {% for underdiv in div.div %}
+                        <div><a href="{% url 'page' app=app.shortname doc_id=document.id page=underdiv.id %}">{{ underdiv.type|capfirst }}: {{ underdiv.title_list|join:", " }}</a></div>
+                    {% endfor %}
+                {% endfor %}
+
+                <!-- Back of the document -->
+                {% if document.back.div %}
+                    <div>Back<div>
+                    {% for div in document.back.div %}
+                        <div><a href="{% url 'page' app=app.shortname doc_id=document.id page=div.id %}">{{ div.type|capfirst }}</a></div>
+                    {% endfor %}
+                {% endif %}
+                </div>
+			{% else %}
                 {% if page != 'contents' %}
-                <ul class="page-nav">
+                <ul class="pager" style="margin-bottom: 20px;">
                     <li><a href="{% url 'page' app=app.shortname doc_id=document.id page='contents' %}">Return to Table of Contents</a></li>
-                    {% if prev_id %}<li><a href="{% url 'page' app=app.shortname doc_id=document.id page=prev_id %}">Previous</a></li>{% endif %}
-                    {% if next_id %}<li><a href="{% url 'page' app=app.shortname doc_id=document.id page=next_id %}">Next</a></li>{% endif %}
+                    {% if prev_id %}<li class="previous"><a href="{% url 'page' app=app.shortname doc_id=document.id page=prev_id %}">Previous</a></li>{% else %}<li class="previous disabled"><a href="#">Previous</a></li>{% endif %}
+                    {% if next_id %}<li class="next"><a href="{% url 'page' app=app.shortname doc_id=document.id page=next_id %}">Next</a></li>{% else %}<li class="next disabled"><a href="#">Next</a></li>{% endif %}
                 </ul>
                 {% endif %}
-            </div>
-            <hr style="margin-bottom: 30px;" />
-			<ul>
-                <!-- Front of the document -->
-				{% if document.front.div %}
-					<li>Front<ul>
-					{% for div in document.front.div %}
-						<li><a href="{% url 'page' app=app.shortname doc_id=document.id page=div.id %}">{{ div.type|capfirst }}</a></li>
-					{% endfor %}
-					</ul></li>
-				{% endif %}
-                
-                <!-- Body of the document -->
-				{% for div in document.body.div %}
-					<li><a href="{% url 'page' app=app.shortname doc_id=document.id page=div.id %}">{{ div.title_list|join:", " }}</a></li>
-					{% if div.div %}
-						<ul>
-							{% for underdiv in div.div %}
-								<li><a href="{% url 'page' app=app.shortname doc_id=document.id page=underdiv.id %}">{{ underdiv.type|capfirst }}: {{ underdiv.title }}</a></li>
-							{% endfor %}
-						</ul>
-					{% endif %}
-				{% endfor %}
-                
-                <!-- Back of the document -->
-				{% if document.back.div %}
-					<li>Back<ul>
-					{% for div in document.back.div %}
-						<li><a href="{% url 'page' app=app.shortname doc_id=document.id page=div.id %}">{{ div.type|capfirst }}</a></li>
-					{% endfor %}
-					</ul></li>
-				{% endif %}
-			</ul>
-			{% else %}
 				{{ formatted|safe }}
 			{% endif %}
 		</div>
