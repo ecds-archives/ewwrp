@@ -101,7 +101,9 @@ def page(request, doc_id, page, app=DEFAULT_COLLECTION):
     ''' Display a specific page '''
     context = importantContextValues(app)
     context['page_in_collection'] = 'page'
-    document = Docs.objects.get(id=doc_id)
+    
+    # Should use "get" here, but I was running into a "returned 2 docs" error
+    document = Docs.objects.filter(id=doc_id)[0]
     context['document'] = document
     if page != 'contents':
         # Create ordered list of all the divs

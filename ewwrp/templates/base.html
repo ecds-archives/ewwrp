@@ -1,3 +1,4 @@
+{% spaceless %}
 <!DOCTYPE html>
 <html>
 	<head>
@@ -5,6 +6,7 @@
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
 		<link rel="stylesheet" href="{% static 'css/main.css' %}">
 		<link rel="stylesheet" href="{% static 'css/tei.css' %}">
+        <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
         <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
 		<title>Emory Women Writers Resource Project</title>
@@ -15,6 +17,7 @@
 		{% block head %}{% endblock %}
 	</head>
 	<body>
+        <!-- Header and drop-down menu -->
 		<div id="header">
 			<ul id="header-nav">
                 <li>
@@ -38,6 +41,9 @@
                 </li>
 			</ul>
 		</div>
+        <!-- End of header -->
+        
+        <!-- Navigation elements -->
         <div id="nav">
             <ul id="main-nav">
 				<li><a href="{% url 'index' app=app.shortname %}">Home</a></li>
@@ -46,9 +52,46 @@
 				<li><a href="{% url 'about' app=app.shortname %}">About</a></li>
             </ul>
         </div>
-		<div id="body" class="container-fluid">
-			{% block body %}{% endblock %}
-		</div>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-sm-3 col-md-2 sidebar">
+                    <ul class="nav nav-sidebar">
+                        <li><a href="{% url 'index' app=app.shortname %}">Home</a></li>
+                        <li><a href="{% url 'browse' app=app.shortname %}">Browse</a></li>
+                        <li><a href="{% url 'search' app=app.shortname %}">Search</a></li>
+                        <li><a href="{% url 'about' app=app.shortname %}">About</a></li>
+                    </ul>
+                    {% if document %}
+                    <ul class="nav nav-sidebar">
+                        {% for div in document.front.div %}
+                        <li><a href="{% url 'page' app=app.shortname doc_id=document.id page=div.id %}">{{ div.title_list|join:", " }}</a></li>
+                            {% for subdiv in div.div %}
+                            <li><a style="padding-left: 30px;" href="{% url 'page' app=app.shortname doc_id=document.id page=subdiv.id %}">{{ subdiv.title_list|join:", "}}</a></li>
+                            {% endfor %}
+                        {% endfor %}
+                        {% for div in document.body.div %}
+                        <li><a href="{% url 'page' app=app.shortname doc_id=document.id page=div.id %}">{{ div.title_list|join:", " }}</a></li>
+                            {% for subdiv in div.div %}
+                            <li><a style="padding-left: 30px;" href="{% url 'page' app=app.shortname doc_id=document.id page=subdiv.id %}">{{ subdiv.title_list|join:", "}}</a></li>
+                            {% endfor %}
+                        {% endfor %}
+                        {% for div in document.back.div %}
+                        <li><a href="{% url 'page' app=app.shortname doc_id=document.id page=div.id %}">{{ div.title_list|join:", " }}</a></li>
+                            {% for subdiv in div.div %}
+                            <li><a style="padding-left: 30px;" href="{% url 'page' app=app.shortname doc_id=document.id page=subdiv.id %}">{{ subdiv.title_list|join:", "}}</a></li>
+                            {% endfor %}
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </div>
+                <!-- Main stuff -->
+                <div id="body" class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+                    {% block body %}{% endblock %}
+                </div>
+            </div>
+        </div>
+        <!-- End of navigation elements -->
+        
 		<div id="footer">
 			<div id="eww">
 				<span>{{ app.longname.0 }}</span>
@@ -60,4 +103,4 @@
         <script src="{% static 'js/main.js' %}"></script>
 	</body>
 </html>
-		
+{% endspaceless %}

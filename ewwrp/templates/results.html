@@ -28,7 +28,7 @@
 	<div class="browse-results container-fluid">
 		{% for page in pages %}
             <div class="panel-body" style="padding: 20px 0px 20px 0px; margin: 0;">
-				<div class="title"><a style="color: #{{ app.color }}; font-size: 15px; font-weight: bold; margin: 0; padding: 0;" href="{% url 'page' app=app.shortname doc_id=page.id page='contents' %}">{{ page.title|truncatechars:100 }}</a></div>
+				<div class="title"><a style="color: #{{ app.color }}; font-size: 15px; font-weight: bold; margin: 0; padding: 0;" href="{% url 'page' app=app.shortname doc_id=page.id page='contents' %}" title="{{ page.title.strip }}">{{ page.title|truncatechars:100 }}</a></div>
 				<div class="details" style="font-size: 13px; margin: 0; padding: 0;">{% if page.author %}{{ page.author }}, {% endif %}{{ page.collection }} Collection <a href="javascript:showMore('more-{{ page.id }}')" style="color: #{{ app.color }};">More</a></div>
                 <div class="moreDetails" id="more-{{ page.id }}">
                     <table class="table table-bordered" style="margin-top: 10px;">

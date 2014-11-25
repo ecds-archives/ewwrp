@@ -10,9 +10,21 @@ a {
 a:hover {
 	text-decoration: underline;
 }
-#collectionmenu a:hover {
+#collectionmenu {
+    position: absolute;
+    top: 10px;
+    left: 20px;
+}
+#collectionmenu > ul > li > a:hover {
     text-decoration: none;
     color: black !important;
+}
+#collectionmenu > a {
+    color: #DDDDDD;
+}
+#collectionmenu > a:hover {
+    color: white;
+    text-decoration: none;
 }
 /* Everything relating to the header */
 #header {
@@ -21,6 +33,7 @@ a:hover {
 	right: 0px;
 	top: 0px;
 	padding: 0px 5px 0px 5px;
+    height: 50px;
 }
 #header-nav {
 	text-align: left;
@@ -41,36 +54,33 @@ a:hover {
 
 #nav {
     position: absolute;
-    left: 0px;
-    right: 0px;
-    top: 35px;
+    right: 15px;
+    top: 8px;
+    color: white;
+}
+.main {
+    margin-top: 50px;   
 }
 #main-nav {
-    text-align: center;
     padding: 2px;
     margin: 0;
     font-size: 18px;
 }
 #main-nav li {
     display: inline;
-}
-#main-nav li + li:before {
-    content: " | ";
-    color: black;
+    padding: 15px;
 }
 #main-nav a {
-    color: black;
+    color: #DDDDDD;
 }
-
-/* Everything relating to the body */
-#body {
-	margin-top: 70px;
-	margin-left: 5px;
-	margin-bottom: 40px;
+#main-nav a:hover {
+    color: white;
+    text-decoration: none;
 }
 
 /* Everything relating to the footer */
 #footer {
+    z-index: 2;
 	font-size: 20px;
 	position: fixed;
 	left: 0px;
